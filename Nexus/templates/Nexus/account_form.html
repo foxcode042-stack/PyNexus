@@ -1,0 +1,128 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f7f8fc">
+    <title>{{ title }} | Tech-Nexus Academy</title>
+    <link rel="icon" type="image/jpeg" href="{% static 'Nexus/tech-nexus-logo.jpg' %}">
+    <link rel="stylesheet" href="{% static 'Nexus/index.css' %}">
+    <link rel="stylesheet" href="{% static 'Nexus/ai_tutor.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
+</head>
+<body class="auth-page" data-api-base="/api" data-csrf-url="{% url 'api_csrf' %}">
+    <header class="auth-topbar">
+        <a class="auth-brand" href="{% url 'home' %}">
+            <img src="{% static 'Nexus/tech-nexus-logo.jpg' %}" alt="">
+            <span>TECH-NEXUS<small>ACADEMY</small></span>
+        </a>
+        <a class="auth-topbar-link" href="{% if is_registration %}{% url 'login' %}{% else %}{% url 'register' %}{% endif %}">
+            {% if is_registration %}Already have an account? <strong>Sign in</strong>{% else %}New to the academy? <strong>Create an account</strong>{% endif %}
+        </a>
+    </header>
+
+    <main class="auth-layout">
+        <aside class="auth-showcase">
+            <div class="auth-showcase-mark" aria-hidden="true">
+                <img src="{% static 'Nexus/tech-nexus-logo.jpg' %}" alt="">
+            </div>
+            <p class="auth-showcase-kicker">TECH-NEXUS ACADEMY</p>
+            <h1>Turn curiosity into code.</h1>
+            <p class="auth-showcase-copy">Build practical technology skills, learn by doing, and make progress at your own pace.</p>
+            <div class="auth-showcase-points">
+                <span><i aria-hidden="true">01</i> Learn with a clear path</span>
+                <span><i aria-hidden="true">02</i> Build real projects</span>
+                <span><i aria-hidden="true">03</i> Grow your confidence</span>
+            </div>
+            <a class="auth-showcase-home" href="{% url 'home' %}">Explore the academy <span aria-hidden="true">↗</span></a>
+        </aside>
+
+        <section class="auth-panel" aria-labelledby="auth-title">
+            <div class="auth-panel-heading">
+                <p class="auth-eyebrow">{{ eyebrow }}</p>
+                <h2 id="auth-title">{{ title }}</h2>
+                {% if is_registration %}
+                    <p>Set up your student account. We’ll send a verification code to your email.</p>
+                {% else %}
+                    <p>Enter your details and confirm it’s you with a code sent to your email.</p>
+                {% endif %}
+            </div>
+
+            {% if messages %}
+                <div class="auth-server-messages" role="status">
+                    {% for message in messages %}<p>{{ message }}</p>{% endfor %}
+                </div>
+            {% endif %}
+            <p class="auth-feedback" data-auth-feedback role="status" hidden></p>
+
+            <div class="auth-social" aria-label="Social sign-in options">
+                <button type="button" class="auth-social-button" disabled aria-describedby="auth-social-note">
+                    <span class="auth-google-mark" aria-hidden="true">G</span>Google
+                </button>
+                <button type="button" class="auth-social-button" disabled aria-describedby="auth-social-note">
+                    <span class="auth-github-mark" aria-hidden="true">GH</span>GitHub
+                </button>
+            </div>
+            <p class="auth-social-note" id="auth-social-note">Google and GitHub sign-in will be available when provider credentials are configured.</p>
+            <div class="auth-divider"><span>or continue with email</span></div>
+
+            <form method="post" class="auth-form" {% if is_registration %}data-auth-register{% else %}data-auth-login{% endif %}>
+                {% csrf_token %}
+                {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+                {% if form.non_field_errors %}
+                    <div class="auth-form-errors" role="alert">{{ form.non_field_errors }}</div>
+                {% endif %}
+                <div class="{% if is_registration %}auth-fields-grid{% else %}auth-fields-stack{% endif %}">
+                    {% for field in form %}
+                        <div class="auth-field{% if field.name == 'password1' or field.name == 'password2' %} auth-field-password{% endif %}">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.help_text %}<div class="auth-field-help">{{ field.help_text|safe }}</div>{% endif %}
+                            {% for error in field.errors %}<p class="auth-field-error" role="alert">{{ error }}</p>{% endfor %}
+                            {% if field.name == "location" and is_registration %}
+                                <button class="auth-location-button" type="button" data-capture-location>Use my current location</button>
+                                <p class="auth-location-status" data-location-status>Optional: browser location is only saved if you choose to share it.</p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+                {% if is_registration %}
+                    <input type="hidden" name="latitude">
+                    <input type="hidden" name="longitude">
+                    <input type="hidden" name="location_accuracy">
+                    <input type="hidden" name="location_captured_at">
+                    <p class="auth-privacy-note">Your account details are used to set up your student profile. Location access is optional.</p>
+                {% else %}
+                    <div class="auth-form-options">
+                        <label class="auth-remember"><input type="checkbox" name="remember"> Keep me signed in</label>
+                        <button class="auth-inline-button" type="button" data-show-forgot>Forgot password?</button>
+                    </div>
+                {% endif %}
+                <button class="auth-submit" type="submit">
+                    <span>{{ submit_label }}</span><span aria-hidden="true">→</span>
+                </button>
+            </form>
+
+            <section class="auth-forgot-panel" data-forgot-panel hidden aria-labelledby="forgot-title">
+                <h3 id="forgot-title">Reset your password</h3>
+                <p>We’ll email you a secure link to choose a new password.</p>
+                <form class="auth-form" data-forgot-form>
+                    {% csrf_token %}
+                    <div class="auth-field">
+                        <label for="forgot-email">Email address</label>
+                        <input id="forgot-email" name="email" type="email" autocomplete="email" required>
+                    </div>
+                    <button class="auth-submit" type="submit"><span>Send reset link</span><span aria-hidden="true">→</span></button>
+                </form>
+                <button class="auth-inline-button" type="button" data-hide-forgot>Back to sign in</button>
+            </section>
+
+            <p class="auth-terms">By continuing, you agree to our <a href="{% url 'terms' %}">Terms</a> and <a href="{% url 'privacy' %}">Privacy Policy</a>.</p>
+            <a class="auth-home-link" href="{% url 'home' %}">← Back to Tech-Nexus Academy</a>
+        </section>
+    </main>
+    <script src="{% static 'Nexus/auth.js' %}" defer></script>
+    {% include "Nexus/ai_chat_widget.html" %}
+</body>
+</html>

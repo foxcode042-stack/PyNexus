@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email verification | Tech-Nexus Academy</title>
+    <link rel="icon" type="image/jpeg" href="{% static 'Nexus/tech-nexus-logo.jpg' %}">
+    <link rel="stylesheet" href="{% static 'Nexus/index.css' %}">
+    <link rel="stylesheet" href="{% static 'Nexus/ai_tutor.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap">
+</head>
+<body class="content-page">
+    <header class="content-header">
+        <a class="content-brand" href="{% url 'home' %}">
+            <img src="{% static 'Nexus/tech-nexus-logo.jpg' %}" alt="">
+            <span class="content-brand-name">TECH-NEXUS <small>ACADEMY</small></span>
+        </a>
+        <nav class="content-nav" aria-label="Main navigation">
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'support' %}">Support</a>
+        </nav>
+    </header>
+    <main class="content-main account-main">
+        <section class="content-card account-card verification-card">
+            <p class="content-eyebrow">Email verification</p>
+            <h1>That link could not be verified</h1>
+            <p class="content-intro">The link may be invalid, expired, or already used. If your account is still pending, request a fresh verification link below.</p>
+            <form method="post" action="{% url 'resend_verification' %}" class="account-form">
+                {% csrf_token %}
+                <div class="account-field">
+                    <label for="verification-email">Email address</label>
+                    <input class="account-input" id="verification-email" name="email" type="email"
+                        autocomplete="email" required>
+                </div>
+                <button class="content-button" type="submit">Send a new verification link</button>
+            </form>
+            <div class="content-actions">
+                <a class="content-button content-button-secondary" href="{% url 'support' %}">Contact support</a>
+            </div>
+        </section>
+    </main>
+    <footer class="content-footer">
+        <p>Tech-Nexus Academy</p>
+        <nav aria-label="Policies">
+            <a href="{% url 'privacy' %}">Privacy</a>
+            <a href="{% url 'terms' %}">Terms</a>
+        </nav>
+    </footer>
+    {% include "Nexus/ai_chat_widget.html" %}
+</body>
+</html>

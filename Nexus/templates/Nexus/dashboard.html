@@ -1,0 +1,285 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f7f8fc">
+    <title>Student dashboard | Tech-Nexus Academy</title>
+    <link rel="icon" type="image/jpeg" href="{% static 'Nexus/tech-nexus-logo.jpg' %}">
+    <link rel="stylesheet" href="{% static 'Nexus/index.css' %}">
+    <link rel="stylesheet" href="{% static 'Nexus/ai_tutor.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="{% static 'Nexus/dashboard.js' %}" defer></script>
+</head>
+<body class="dashboard-page" data-api-base="/api" data-csrf-url="{% url 'api_csrf' %}">
+    <button class="dashboard-scrim" id="dashboard-scrim" type="button" aria-label="Close navigation" hidden></button>
+    <aside class="dashboard-sidebar" id="dashboard-sidebar" aria-label="Student dashboard navigation">
+        <a class="dashboard-brand" href="{% url 'home' %}">
+            <span class="dashboard-brand-mark"><img src="{% static 'Nexus/tech-nexus-logo.jpg' %}" alt=""></span>
+            <span><strong>TECH-NEXUS</strong><small>ACADEMY</small></span>
+        </a>
+
+        <p class="dashboard-nav-label">Workspace</p>
+        <nav class="dashboard-nav">
+            <a class="dashboard-nav-link is-active" href="#overview" aria-current="page">
+                <i class="fas fa-grip" aria-hidden="true"></i><span>Dashboard</span>
+            </a>
+            <a class="dashboard-nav-link" href="#profile">
+                <i class="fas fa-user" aria-hidden="true"></i><span>My profile</span>
+            </a>
+            <a class="dashboard-nav-link" href="{% url 'courses' %}">
+                <i class="fas fa-book-open" aria-hidden="true"></i><span>Academy courses</span>
+            </a>
+            <a class="dashboard-nav-link" href="#payments">
+                <i class="fas fa-credit-card" aria-hidden="true"></i><span>Payments</span>
+            </a>
+            <a class="dashboard-nav-link" href="{% url 'certificates' %}">
+                <i class="fas fa-award" aria-hidden="true"></i><span>Certificates</span>
+            </a>
+        </nav>
+
+        <p class="dashboard-nav-label dashboard-nav-label--secondary">Connect &amp; grow</p>
+        <nav class="dashboard-nav">
+            <a class="dashboard-nav-link" href="{% url 'programmes' %}">
+                <i class="fas fa-route" aria-hidden="true"></i><span>Learning paths</span>
+            </a>
+            <a class="dashboard-nav-link" href="{% url 'support' %}">
+                <i class="fas fa-circle-question" aria-hidden="true"></i><span>Help &amp; support</span>
+            </a>
+            <a class="dashboard-nav-link" href="{% url 'privacy' %}">
+                <i class="fas fa-shield-halved" aria-hidden="true"></i><span>Privacy &amp; security</span>
+            </a>
+        </nav>
+
+        <div class="dashboard-sidebar-note">
+            <span class="dashboard-note-icon"><i class="fas fa-code" aria-hidden="true"></i></span>
+            <strong>Learn by building</strong>
+            <p>Your dashboard keeps your account and programme information in one place.</p>
+            <a href="{% url 'courses' %}">Explore courses <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+        </div>
+        <div class="dashboard-sidebar-footer">
+            <span>Tech-Nexus Academy</span>
+            <a href="{% url 'contact' %}">Contact academy</a>
+        </div>
+    </aside>
+
+    <main class="dashboard-main">
+        <header class="dashboard-topbar">
+            <div class="dashboard-topbar-start">
+                <button class="dashboard-menu-toggle" id="dashboard-menu-toggle" type="button"
+                    aria-label="Open dashboard navigation" aria-controls="dashboard-sidebar" aria-expanded="false">
+                    <i class="fas fa-bars" aria-hidden="true"></i>
+                </button>
+                <label class="dashboard-search">
+                    <i class="fas fa-magnifying-glass" aria-hidden="true"></i>
+                    <input id="dashboard-search-input" type="search" placeholder="Search programmes or payments"
+                        aria-label="Search programmes and payment records">
+                    <kbd>/</kbd>
+                </label>
+            </div>
+            <div class="dashboard-topbar-actions">
+                <a class="dashboard-help-link" href="{% url 'support' %}">
+                    <i class="far fa-circle-question" aria-hidden="true"></i><span>Help</span>
+                </a>
+                <span class="dashboard-topbar-divider" aria-hidden="true"></span>
+                <div class="dashboard-user">
+                    <span class="dashboard-user-avatar" aria-hidden="true">
+                        {{ request.user.first_name|default:request.user.username|slice:":1"|upper }}
+                    </span>
+                    <span class="dashboard-user-copy">
+                        <strong>{{ request.user.get_full_name|default:request.user.username }}</strong>
+                        <small>Student account</small>
+                    </span>
+                </div>
+                <form method="post" action="{% url 'logout' %}" class="dashboard-logout-form" data-auth-logout>
+                    {% csrf_token %}
+                    <button class="dashboard-logout" type="submit" aria-label="Sign out" title="Sign out">
+                        <i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i>
+                    </button>
+                </form>
+            </div>
+        </header>
+
+        <div class="dashboard-content">
+            {% if messages %}
+                <div class="dashboard-messages" aria-live="polite">
+                    {% for message in messages %}
+                        <p class="dashboard-message">{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <section class="dashboard-page-heading" id="overview">
+                <div>
+                    <p class="dashboard-eyebrow">{% now "l, F j, Y" %}</p>
+                    <h1>Welcome back, {{ request.user.first_name|default:request.user.username }}.</h1>
+                    <p>Your academy account overview and next steps.</p>
+                </div>
+                <div class="dashboard-student-id">
+                    <span class="dashboard-student-id-icon"><i class="fas fa-id-card" aria-hidden="true"></i></span>
+                    <span><small>Student reference</small><strong>{{ student_reference }}</strong></span>
+                </div>
+            </section>
+
+            <section class="dashboard-overview-grid" aria-label="Account summary">
+                <article class="dashboard-stat-card">
+                    <span class="dashboard-stat-icon dashboard-stat-icon--purple"><i class="fas fa-user-check" aria-hidden="true"></i></span>
+                    <span class="dashboard-stat-copy"><small>Account status</small><strong>{% if request.user.is_active %}Active{% else %}Inactive{% endif %}</strong><em>Academy account</em></span>
+                </article>
+                <article class="dashboard-stat-card">
+                    <span class="dashboard-stat-icon dashboard-stat-icon--green"><i class="fas fa-credit-card" aria-hidden="true"></i></span>
+                    <span class="dashboard-stat-copy"><small>Payment records</small><strong>{{ payment_count }}</strong><em>Recorded on this account</em></span>
+                </article>
+                <article class="dashboard-stat-card dashboard-stat-card--wide">
+                    <span class="dashboard-stat-icon dashboard-stat-icon--orange"><i class="fas fa-graduation-cap" aria-hidden="true"></i></span>
+                    <span class="dashboard-stat-copy"><small>Learning progress</small><strong>Not available yet</strong><em>Course activity tracking is not connected</em></span>
+                </article>
+            </section>
+
+            <div class="dashboard-layout-grid">
+                <div class="dashboard-primary-column">
+                    <section class="dashboard-widget" id="profile">
+                        <div class="dashboard-widget-heading">
+                            <div>
+                                <p class="dashboard-eyebrow">Account details</p>
+                                <h2>Student profile</h2>
+                            </div>
+                            <span class="dashboard-status-pill"><span></span> Account active</span>
+                        </div>
+                        <div class="dashboard-profile-summary">
+                            <span class="dashboard-profile-avatar" aria-hidden="true">
+                                {{ request.user.first_name|default:request.user.username|slice:":1"|upper }}
+                            </span>
+                            <span><strong>{{ profile.full_name|default:request.user.get_full_name|default:request.user.username }}</strong><small>{{ request.user.email }}</small></span>
+                        </div>
+                        <dl class="dashboard-profile-details">
+                            <div><dt>Username</dt><dd>{{ request.user.username }}</dd></div>
+                            {% if profile.phone %}<div><dt>Phone</dt><dd>{{ profile.phone }}</dd></div>{% endif %}
+                            {% if profile.location %}<div><dt>Location</dt><dd>{{ profile.location }}</dd></div>{% endif %}
+                            {% if profile.state %}<div><dt>State</dt><dd>{{ profile.state }}</dd></div>{% endif %}
+                            {% if profile.country %}<div><dt>Country</dt><dd>{{ profile.country }}</dd></div>{% endif %}
+                            {% if profile.occupation %}<div><dt>Occupation</dt><dd>{{ profile.occupation }}</dd></div>{% endif %}
+                            {% if profile.nationality %}<div><dt>Nationality</dt><dd>{{ profile.nationality }}</dd></div>{% endif %}
+                        </dl>
+                        <p class="dashboard-inline-note">Profile editing, photo uploads, and social links are not enabled yet.</p>
+                    </section>
+
+                    <section class="dashboard-widget" aria-labelledby="programmes-title">
+                        <div class="dashboard-widget-heading">
+                            <div>
+                                <p class="dashboard-eyebrow">Choose your next step</p>
+                                <h2 id="programmes-title">Programme checkout</h2>
+                            </div>
+                            <a class="dashboard-widget-link" href="{% url 'programmes' %}">Programme details <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+                        </div>
+                        <p class="dashboard-widget-description">Hosted Paystack checkout links. Confirm current availability and fees with the academy first; payments are not automatically verified on this website.</p>
+                        <div class="dashboard-programme-grid">
+                            {% for plan in paystack_plans %}
+                                <article class="dashboard-programme-card" data-dashboard-searchable>
+                                    <span class="dashboard-programme-period">{{ plan.duration }}</span>
+                                    <h3>{{ plan.name }}</h3>
+                                    <strong class="dashboard-programme-fee">{{ plan.fee }}</strong>
+                                    <a class="dashboard-checkout-link" href="{{ plan.url }}" target="_blank" rel="noopener noreferrer">
+                                        Continue to Paystack <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                                    </a>
+                                </article>
+                            {% endfor %}
+                        </div>
+                    </section>
+
+                    <section class="dashboard-widget" id="payments">
+                        <div class="dashboard-widget-heading">
+                            <div>
+                                <p class="dashboard-eyebrow">Account activity</p>
+                                <h2>Payment history</h2>
+                            </div>
+                        </div>
+                        {% if payments %}
+                            <div class="dashboard-payment-list">
+                                {% for payment in payments %}
+                                    <article class="dashboard-payment-row" data-dashboard-searchable>
+                                        <span class="dashboard-payment-icon"><i class="fas fa-receipt" aria-hidden="true"></i></span>
+                                        <span class="dashboard-payment-copy">
+                                            <strong>{{ payment.plan_name }}</strong>
+                                            <small>{{ payment.created_at|date:"M j, Y" }} · {{ payment.transaction_reference }}</small>
+                                        </span>
+                                        <span class="dashboard-payment-amount">₦{{ payment.amount_paid|floatformat:2 }}</span>
+                                        <span class="dashboard-payment-status dashboard-payment-status--{{ payment.status|lower }}">{{ payment.get_status_display }}</span>
+                                    </article>
+                                {% endfor %}
+                            </div>
+                            <p class="dashboard-inline-note">Only records saved by the academy appear here. External checkout transactions may need manual confirmation.</p>
+                        {% else %}
+                            <div class="dashboard-empty-state">
+                                <span><i class="fas fa-receipt" aria-hidden="true"></i></span>
+                                <strong>No payment records yet</strong>
+                                <p>When the academy records a payment, its status will appear here.</p>
+                            </div>
+                        {% endif %}
+                    </section>
+                </div>
+
+                <aside class="dashboard-secondary-column" aria-label="Learning and support information">
+                    <section class="dashboard-goal-card">
+                        <span class="dashboard-goal-glow" aria-hidden="true"></span>
+                        <div class="dashboard-goal-content">
+                            <span class="dashboard-goal-icon"><i class="fas fa-code" aria-hidden="true"></i></span>
+                            <p class="dashboard-eyebrow">Learning activity</p>
+                            <h2>Your learning path</h2>
+                            <p>Lessons, project submissions, and course progress are not yet tracked in this dashboard.</p>
+                            <a href="{% url 'courses' %}">Browse course areas <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+                        </div>
+                    </section>
+
+                    <section class="dashboard-widget dashboard-schedule-widget">
+                        <div class="dashboard-widget-heading">
+                            <div><p class="dashboard-eyebrow">Upcoming</p><h2>Schedule</h2></div>
+                            <i class="far fa-calendar" aria-hidden="true"></i>
+                        </div>
+                        <div class="dashboard-empty-state dashboard-empty-state--compact">
+                            <span><i class="far fa-calendar-days" aria-hidden="true"></i></span>
+                            <strong>No cohort dates published</strong>
+                            <p>Contact the academy for the current class schedule.</p>
+                            <a href="{% url 'contact' %}">Ask about schedules</a>
+                        </div>
+                    </section>
+
+                    <section class="dashboard-widget dashboard-resources-widget">
+                        <div class="dashboard-widget-heading">
+                            <div><p class="dashboard-eyebrow">Get started</p><h2>Academy links</h2></div>
+                        </div>
+                        <a class="dashboard-resource-link" href="{% url 'courses' %}">
+                            <span class="dashboard-resource-icon dashboard-resource-icon--purple"><i class="fas fa-book-open" aria-hidden="true"></i></span>
+                            <span><strong>Course areas</strong><small>Explore planned subjects</small></span>
+                            <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                        </a>
+                        <a class="dashboard-resource-link" href="{% url 'programmes' %}">
+                            <span class="dashboard-resource-icon dashboard-resource-icon--green"><i class="fas fa-route" aria-hidden="true"></i></span>
+                            <span><strong>Programmes</strong><small>Review durations and fees</small></span>
+                            <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                        </a>
+                        <a class="dashboard-resource-link" href="{% url 'support' %}">
+                            <span class="dashboard-resource-icon dashboard-resource-icon--orange"><i class="fas fa-headset" aria-hidden="true"></i></span>
+                            <span><strong>Support</strong><small>Contact the academy team</small></span>
+                            <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                        </a>
+                    </section>
+
+                    <section class="dashboard-privacy-note">
+                        <i class="fas fa-shield-halved" aria-hidden="true"></i>
+                        <p><strong>Keep your account safe.</strong> The academy will never ask you to share your password or verification link.</p>
+                        <a href="{% url 'privacy' %}">Privacy information</a>
+                        <button class="dashboard-session-action" type="button" data-logout-other-devices>Sign out of other devices</button>
+                        <p class="dashboard-session-message" data-auth-feedback role="status" hidden></p>
+                    </section>
+                </aside>
+            </div>
+            <p class="dashboard-search-empty" id="dashboard-search-empty" hidden>No matching programme or payment found.</p>
+            <p class="dashboard-bottom-note">Tech-Nexus Academy · <a href="{% url 'support' %}">Need help?</a></p>
+        </div>
+    </main>
+    <script src="{% static 'Nexus/auth.js' %}" defer></script>
+    {% include "Nexus/ai_chat_widget.html" %}
+</body>
+</html>

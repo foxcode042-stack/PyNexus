@@ -1,0 +1,83 @@
+{% load static %}
+<div class="nexus-ai-widget"
+     data-ai-chat-widget
+     data-csrf-url="{% url 'api_csrf' %}"
+     data-chat-url="{% url 'api_ai_chat' %}">
+    <button class="nexus-ai-launcher" type="button" data-widget-toggle aria-expanded="false" aria-controls="nexus-ai-panel"
+            aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight" title="Drag to move · Click to ask Nexus AI">
+        <span class="nexus-ai-launcher-mark" aria-hidden="true">
+            <img src="{% static 'Nexus/tech-nexus-logo.jpg' %}" alt="">
+            <span class="nexus-ai-status-dot"></span>
+        </span>
+        <span class="nexus-ai-launcher-copy"><strong>Ask Nexus AI</strong><small>Programming tutor</small></span>
+        <span class="nexus-ai-launcher-spark" aria-hidden="true">✦</span>
+    </button>
+
+    <button class="nexus-ai-backdrop" type="button" data-widget-backdrop aria-label="Close AI tutor" hidden></button>
+
+    <section class="nexus-ai-panel" id="nexus-ai-panel" data-widget-panel role="dialog" aria-modal="true"
+             aria-label="Nexus AI programming tutor" hidden>
+        <aside class="nexus-ai-sidebar" data-chat-sidebar>
+            <div class="nexus-ai-sidebar-brand">
+                <span class="nexus-ai-mark"><img src="{% static 'Nexus/tech-nexus-logo.jpg' %}" alt=""></span>
+                <span><strong>Nexus AI</strong><small>Programming tutor</small></span>
+                <button class="nexus-ai-icon-button nexus-ai-sidebar-close" type="button" data-close-sidebar aria-label="Close chat history">×</button>
+            </div>
+            <button class="nexus-ai-new-chat" type="button" data-new-chat><span aria-hidden="true">＋</span> New conversation</button>
+            <p class="nexus-ai-section-label">Recent chats</p>
+            <nav class="nexus-ai-history" data-chat-history aria-label="Recent conversations"></nav>
+            <label class="nexus-ai-level-label" for="nexus-ai-level">Your learning level</label>
+            <select class="nexus-ai-level" id="nexus-ai-level" data-learning-level>
+                <option>Beginner</option>
+                <option>Intermediate</option>
+                <option>Advanced</option>
+            </select>
+        </aside>
+
+        <div class="nexus-ai-main">
+            <header class="nexus-ai-header">
+                <button class="nexus-ai-icon-button nexus-ai-history-toggle" type="button" data-show-history aria-label="Show chat history">☰</button>
+                <div class="nexus-ai-heading">
+                    <strong>Nexus AI Tutor</strong>
+                    <small><span class="nexus-ai-online-dot"></span>Ready to help</small>
+                </div>
+                <span class="nexus-ai-preview-label">Preview</span>
+                <button class="nexus-ai-icon-button" type="button" data-voice-replies aria-label="Enable spoken replies" aria-pressed="false" title="Enable spoken replies">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M18 6a8 8 0 0 1 0 12"/></svg>
+                </button>
+                <button class="nexus-ai-icon-button" type="button" data-close-widget aria-label="Close AI tutor">×</button>
+            </header>
+
+            <div class="nexus-ai-messages" data-widget-messages aria-live="polite" aria-relevant="additions text"></div>
+            <p class="nexus-ai-feedback" data-widget-feedback role="status" hidden></p>
+
+            <footer class="nexus-ai-composer-area">
+                <div class="nexus-ai-attachment" data-widget-attachment hidden>
+                    <span class="nexus-ai-attachment-name" data-attachment-name></span>
+                    <button class="nexus-ai-icon-button" type="button" data-remove-attachment aria-label="Remove attachment">×</button>
+                </div>
+                <form class="nexus-ai-composer" data-widget-form>
+                    <label class="nexus-ai-sr-only" for="nexus-ai-input">Ask a programming question</label>
+                    <textarea id="nexus-ai-input" data-widget-input rows="2" maxlength="4000" placeholder="Ask a coding question..."></textarea>
+                    <div class="nexus-ai-composer-tools">
+                        <div class="nexus-ai-tool-buttons">
+                            <input type="file" data-widget-file accept=".txt,.md,.py,.js,.ts,.jsx,.tsx,.html,.css,.json,.csv" hidden>
+                            <button class="nexus-ai-icon-button" type="button" data-attach-file aria-label="Attach a text or code file" title="Attach a text or code file">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21.4 11.6-8.8 8.8a6 6 0 0 1-8.5-8.5l9.2-9.2a4 4 0 0 1 5.7 5.7l-9.2 9.2a2 2 0 0 1-2.8-2.8l8.5-8.5"/></svg>
+                            </button>
+                            <button class="nexus-ai-icon-button" type="button" data-voice-input aria-label="Speak your question" title="Speak your question">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5M8 22h8"/></svg>
+                            </button>
+                            <span class="nexus-ai-hint">Enter to send · Shift + Enter for a new line</span>
+                        </div>
+                        <button class="nexus-ai-send" type="submit" data-widget-send aria-label="Send message" disabled>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+                        </button>
+                    </div>
+                </form>
+                <p class="nexus-ai-disclaimer">Preview replies are examples, not live AI. Review code before using it.</p>
+            </footer>
+        </div>
+    </section>
+</div>
+<script src="{% static 'Nexus/ai_tutor.js' %}" defer></script>

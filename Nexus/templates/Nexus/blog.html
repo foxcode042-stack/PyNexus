@@ -1,0 +1,229 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f7f8fc">
+    <title>Academy Blog | Tech-Nexus Academy</title>
+    <meta name="description" content="Practical tutorials, thoughtful guides and technology insights from Tech-Nexus Academy.">
+    <link rel="icon" type="image/jpeg" href="{% static 'Nexus/tech-nexus-logo.jpg' %}">
+    <link rel="stylesheet" href="{% static 'Nexus/index.css' %}">
+    <link rel="stylesheet" href="{% static 'Nexus/ai_tutor.css' %}">
+    <link rel="stylesheet" href="{% static 'Nexus/blog.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
+</head>
+<body class="academy-blog" data-api-base="/api" data-csrf-url="{% url 'api_csrf' %}">
+    <header class="blog-header">
+        <div class="blog-header-inner">
+            <a class="blog-brand" href="{% url 'home' %}">
+                <img src="{% static 'Nexus/tech-nexus-logo.jpg' %}" alt="">
+                <span><strong>TECH-NEXUS</strong><small>ACADEMY BLOG</small></span>
+            </a>
+            <nav class="blog-nav" aria-label="Blog navigation">
+                <a href="#latest">Latest</a>
+                <a href="#latest">Tutorials</a>
+                <a href="#latest">Resources</a>
+                <a href="#newsletter">Newsletter</a>
+            </nav>
+            <div class="blog-header-actions">
+                <button class="blog-theme-toggle" type="button" data-theme-toggle aria-label="Use dark mode" title="Toggle color theme">
+                    <svg data-theme-icon="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 15.5A8.5 8.5 0 0 1 8.5 3.5a8.5 8.5 0 1 0 12 12Z"/></svg>
+                </button>
+                <a class="blog-login-button" href="{% url 'login' %}">Student login</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="blog-reading-progress" data-reading-progress hidden></div>
+        <div data-blog-index>
+            <section class="blog-hero">
+                <div class="blog-hero-glow" aria-hidden="true"></div>
+                <div class="blog-hero-inner">
+                    <div class="blog-hero-copy">
+                        <span class="blog-pill">Tech-Nexus knowledge centre</span>
+                        <h1>Explore. Learn.<br><span>Build. Advance.</span></h1>
+                        <p>Practical tutorials, thoughtful guides and industry insights to help you grow from curious beginner to confident builder.</p>
+                        <form class="blog-search" data-blog-search-form role="search">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+                            <input type="search" data-blog-search placeholder="Search tutorials, topics or keywords…" aria-label="Search blog articles">
+                            <button type="submit">Search</button>
+                        </form>
+                        <div class="blog-popular">
+                            <span>Popular:</span>
+                            <button type="button" data-search-term="Django">Django</button>
+                            <button type="button" data-search-term="JavaScript">JavaScript</button>
+                            <button type="button" data-search-category="AI &amp; Machine Learning">Machine Learning</button>
+                        </div>
+                    </div>
+                    <button class="blog-featured" type="button" data-open-article="{{ featured_post.id }}" aria-label="Read {{ featured_post.title }}">
+                        <img src="{{ featured_post.image }}" alt="{{ featured_post.image_alt }}" fetchpriority="high">
+                        <span class="blog-featured-shade"></span>
+                        <span class="blog-featured-label">Editor’s pick</span>
+                        <span class="blog-featured-content">
+                            <span class="blog-featured-category">{{ featured_post.category }}</span>
+                            <strong>{{ featured_post.title }}</strong>
+                            <span class="blog-featured-meta">{{ featured_post.author }} <i aria-hidden="true">·</i> {{ featured_post.read_time }} <b aria-hidden="true">→</b></span>
+                        </span>
+                    </button>
+                </div>
+            </section>
+
+            <section class="blog-category-bar" aria-label="Filter articles by topic">
+                <div class="blog-category-list">
+                    {% for category in categories %}
+                        <button type="button" class="blog-category{% if forloop.first %} is-active{% endif %}" data-category="{{ category }}" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}">{{ category }}</button>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="blog-latest" id="latest">
+                <div class="blog-section-heading">
+                    <div>
+                        <p class="blog-kicker">Fresh from the academy</p>
+                        <h2 data-results-heading>Latest articles</h2>
+                        <p class="blog-results-count" data-results-count>{{ posts|length }} practical guides ready to explore</p>
+                    </div>
+                    <button class="blog-clear-filters" type="button" data-clear-filters hidden>Clear filters</button>
+                </div>
+                <div class="blog-article-grid" data-article-grid>
+                    {% for post in posts %}
+                        <article class="blog-article-card" data-article-card data-article-id="{{ post.id }}" data-slug="{{ post.slug }}" data-title="{{ post.title }}" data-excerpt="{{ post.excerpt }}" data-category="{{ post.category }}" data-author="{{ post.author }}" data-role="{{ post.role }}" data-date="{{ post.date }}" data-read-time="{{ post.read_time }}" data-image="{{ post.image }}" data-image-alt="{{ post.image_alt }}" data-video="{{ post.video|yesno:'true,false' }}">
+                            <button class="blog-article-open" type="button" data-open-article="{{ post.id }}" aria-label="Read {{ post.title }}">
+                                <span class="blog-card-image">
+                                    <img src="{{ post.image }}" alt="{{ post.image_alt }}" loading="lazy">
+                                    {% if post.video %}<span class="blog-video-badge"><span aria-hidden="true">▶</span> VIDEO</span>{% endif %}
+                                </span>
+                                <span class="blog-card-copy">
+                                    <span class="blog-card-category">{{ post.category }}</span>
+                                    <strong class="blog-card-title">{{ post.title }}</strong>
+                                    <span class="blog-card-excerpt">{{ post.excerpt }}</span>
+                                    <span class="blog-card-meta"><span>{{ post.author }}</span><span>{{ post.read_time }}</span></span>
+                                </span>
+                            </button>
+                        </article>
+                    {% endfor %}
+                </div>
+                <div class="blog-empty-state" data-empty-state hidden>
+                    <strong>No articles found</strong>
+                    <p>Try a different keyword or topic.</p>
+                </div>
+            </section>
+
+            <section class="blog-newsletter-section" id="newsletter">
+                <div class="blog-newsletter">
+                    <span class="blog-newsletter-glow blog-newsletter-glow--one" aria-hidden="true"></span>
+                    <span class="blog-newsletter-glow blog-newsletter-glow--two" aria-hidden="true"></span>
+                    <div class="blog-newsletter-content">
+                        <span class="blog-kicker">The weekly build</span>
+                        <h2>One useful idea, every week.</h2>
+                        <p>Get practical tutorials, curated tools and academy updates in your inbox.</p>
+                        <form class="blog-newsletter-form" data-newsletter-form>
+                            {% csrf_token %}
+                            <label class="visually-hidden" for="blog-newsletter-email">Your email address</label>
+                            <input id="blog-newsletter-email" name="email" type="email" placeholder="Your email address" autocomplete="email" required>
+                            <button type="submit">Subscribe</button>
+                        </form>
+                        <p class="blog-newsletter-feedback" data-newsletter-feedback role="status" hidden></p>
+                        <small>Your email is saved for future academy updates. Delivery is not configured yet. See our <a href="{% url 'privacy' %}">Privacy Policy</a>.</small>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <section class="blog-reader" data-blog-reader hidden aria-labelledby="reader-title">
+            <div class="blog-reader-heading">
+                <div class="blog-reader-heading-inner">
+                    <button class="blog-back-button" type="button" data-back-to-blog>← Back to all articles</button>
+                    <span class="blog-reader-category" data-reader-category></span>
+                    <h1 id="reader-title" data-reader-title></h1>
+                    <p class="blog-reader-excerpt" data-reader-excerpt></p>
+                    <div class="blog-reader-byline">
+                        <span class="blog-author-avatar" data-author-initials></span>
+                        <span><strong data-reader-author></strong><small data-reader-role></small></span>
+                        <span class="blog-byline-divider" aria-hidden="true"></span>
+                        <span class="blog-reader-date"><span data-reader-date></span> · <span data-reader-time></span></span>
+                    </div>
+                </div>
+            </div>
+            <div class="blog-reader-layout">
+                <article class="blog-reader-article">
+                    <img class="blog-reader-image" data-reader-image src="" alt="">
+                    <div class="blog-prose" data-reader-content></div>
+                    <div class="blog-feedback-card">
+                        <div><strong>Was this guide useful?</strong><p>Your feedback helps us publish better lessons.</p></div>
+                        <div class="blog-feedback-actions">
+                            <button type="button" data-like-article aria-pressed="false">♡ <span>Like</span></button>
+                            <button type="button" data-bookmark-article aria-label="Save article">♧</button>
+                            <button type="button" data-share-article aria-label="Share article">↗</button>
+                        </div>
+                    </div>
+                    <p class="blog-article-feedback" data-article-feedback role="status" hidden></p>
+                    <section class="blog-comments">
+                        <h2>Join the discussion <span data-comment-count>(0)</span></h2>
+                        <p class="blog-comments-note">Comments are saved in this browser only.</p>
+                        <form class="blog-comment-form" data-comment-form>
+                            <label class="visually-hidden" for="blog-comment-text">Your comment</label>
+                            <textarea id="blog-comment-text" name="comment" maxlength="1000" placeholder="Share a question or insight…" required></textarea>
+                            <div><button type="submit">Post comment</button></div>
+                        </form>
+                        <div class="blog-comment-list" data-comment-list></div>
+                    </section>
+                </article>
+                <aside class="blog-reading-tools">
+                    <p>Reading tools</p>
+                    <button type="button" data-listen-article>◖)) <span>Listen to article</span></button>
+                    <button type="button" data-bookmark-article>♧ <span>Save for later</span></button>
+                    <button type="button" data-share-article>↗ <span>Share guide</span></button>
+                </aside>
+            </div>
+            <section class="blog-related">
+                <div class="blog-related-inner">
+                    <div class="blog-section-heading">
+                        <div><p class="blog-kicker">Keep learning</p><h2>Related articles</h2></div>
+                        <button type="button" data-back-to-blog>View all</button>
+                    </div>
+                    <div class="blog-related-grid" data-related-grid></div>
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <footer class="blog-footer">
+        <div class="blog-footer-inner">
+            <a class="blog-brand blog-brand-footer" href="{% url 'home' %}">
+                <img src="{% static 'Nexus/tech-nexus-logo.jpg' %}" alt="">
+                <span><strong>TECH-NEXUS</strong><small>ACADEMY BLOG</small></span>
+            </a>
+            <p>Practical technology education for curious minds and future builders. Explore. Learn. Build. Advance.</p>
+            <nav aria-label="Academy links">
+                <a href="{% url 'about' %}">About</a>
+                <a href="{% url 'privacy' %}">Privacy</a>
+                <a href="{% url 'contact' %}">Contact</a>
+            </nav>
+        </div>
+    </footer>
+
+    <template data-article-content>
+        <p class="blog-lead" data-article-lead></p>
+        <div data-article-sections></div>
+    </template>
+    {% for post in posts %}
+        <template data-article-sections-for="{{ post.id }}">
+            {% for section in post.sections %}
+                <h2>{{ section.heading }}</h2>
+                <p>{{ section.paragraph }}</p>
+                {% if post.id == 1 and forloop.first %}
+                    <pre><code>class CourseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Course
+        fields = ["id", "title", "level"]</code></pre>
+                {% endif %}
+            {% endfor %}
+        </template>
+    {% endfor %}
+    <script src="{% static 'Nexus/blog.js' %}" defer></script>
+    {% include "Nexus/ai_chat_widget.html" %}
+</body>
+</html>

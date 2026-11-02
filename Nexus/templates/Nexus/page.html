@@ -1,0 +1,178 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} | Tech-Nexus Academy</title>
+    <meta name="description" content="{{ intro }}">
+    <link rel="icon" type="image/jpeg" href="{% static 'Nexus/tech-nexus-logo.jpg' %}">
+    <link rel="stylesheet" href="{% static 'Nexus/index.css' %}">
+    <link rel="stylesheet" href="{% static 'Nexus/ai_tutor.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap">
+</head>
+<body class="content-page content-page--{{ slug }}">
+    <header class="content-header">
+        <a class="content-brand" href="{% url 'home' %}">
+            <img src="{% static 'Nexus/tech-nexus-logo.jpg' %}" alt="">
+            <span class="content-brand-name">TECH-NEXUS <small>ACADEMY</small></span>
+        </a>
+        <nav class="content-nav" aria-label="Main navigation">
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'courses' %}">Courses</a>
+            <a href="{% url 'programmes' %}">Programmes</a>
+            <a href="{% url 'about' %}">About</a>
+            <a href="{% url 'blog' %}">Blog</a>
+            <a href="{% url 'contact' %}">Contact</a>
+            <a href="{% url 'dashboard' %}">Student area</a>
+        </nav>
+    </header>
+    <main class="content-main">
+        <a class="content-back-link" href="{% url 'home' %}">&larr; Back to home</a>
+        {% if slug == "about" or slug == "contact" %}
+            <section class="page-hero page-hero--{{ slug }}{% if slug == 'about' %} about-reveal{% endif %}">
+                <div class="page-hero-copy">
+                    <p class="content-eyebrow">{{ eyebrow }}</p>
+                    <h1>{{ title }}</h1>
+                    <p>{{ intro }}</p>
+                    {% if slug == "contact" %}
+                        <a class="content-button" href="#contact-enquiry">Send an enquiry</a>
+                    {% endif %}
+                </div>
+                {% if slug == "about" %}
+                    <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&amp;fit=crop&amp;w=1100&amp;q=85"
+                        alt="People collaborating on a technology project" fetchpriority="high">
+                {% else %}
+                    <img src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&amp;fit=crop&amp;w=1100&amp;q=85"
+                        alt="A team working together at a table" fetchpriority="high">
+                {% endif %}
+            </section>
+        {% endif %}
+        <article class="content-card{% if slug == 'about' %} prose-copy about-copy{% elif slug == 'terms' %} terms-copy{% elif slug == 'privacy' %} privacy-copy{% endif %}">
+            {% if slug != "about" and slug != "contact" %}
+                <p class="content-eyebrow">{{ eyebrow }}</p>
+                <h1>{{ title }}</h1>
+                <p class="content-intro">{{ intro }}</p>
+            {% endif %}
+            {% for section in sections %}
+                <section class="content-section{% if slug == 'about' %} about-reveal{% endif %}">
+                    <h2>{{ section.heading }}</h2>
+                    {% for paragraph in section.paragraphs %}
+                        <p>{{ paragraph }}</p>
+                    {% endfor %}
+                </section>
+            {% endfor %}
+            {% if slug == "contact" %}
+                <section class="contact-enquiry-panel" id="contact-enquiry" aria-labelledby="contact-enquiry-title">
+                    <div class="contact-enquiry-copy">
+                        <p class="content-eyebrow">Contact the academy</p>
+                        <h2 id="contact-enquiry-title">How can we help?</h2>
+                        <p>Send your question to our team. We’ll reply using the email address you provide.</p>
+                        <a href="mailto:technonexusacademy@gmail.com">technonexusacademy@gmail.com</a>
+                        <a href="https://wa.me/2349039759275">WhatsApp: +234 903 975 9275</a>
+                    </div>
+                    <form class="contact-enquiry-form" data-contact-form data-contact-url="{% url 'api_contact_enquiries' %}">
+                        {% csrf_token %}
+                        <p class="contact-form-feedback" data-contact-feedback role="status" hidden></p>
+                        <div class="contact-form-grid">
+                            <label>
+                                <span>Full name</span>
+                                <input name="full_name" type="text" autocomplete="name" maxlength="150" required>
+                            </label>
+                            <label>
+                                <span>Email address</span>
+                                <input name="email" type="email" autocomplete="email" maxlength="254" required>
+                            </label>
+                            <label>
+                                <span>Phone number <small>Optional</small></span>
+                                <input name="phone_number" type="tel" autocomplete="tel" maxlength="30">
+                            </label>
+                            <label>
+                                <span>What is this about?</span>
+                                <select name="category" required>
+                                    <option value="">Choose a topic</option>
+                                    <option value="general">General enquiry</option>
+                                    <option value="courses">Courses</option>
+                                    <option value="enrolment">Enrolment</option>
+                                    <option value="payments">Payments</option>
+                                    <option value="technical_support">Technical support</option>
+                                    <option value="partnerships">Partnerships</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </label>
+                            <label class="contact-form-wide">
+                                <span>Subject</span>
+                                <input name="subject" type="text" maxlength="180" required>
+                            </label>
+                            <label class="contact-form-wide">
+                                <span>Message</span>
+                                <textarea name="message" rows="5" maxlength="6000" required></textarea>
+                            </label>
+                        </div>
+                        <button class="content-button" type="submit" data-contact-submit>Send enquiry</button>
+                    </form>
+                </section>
+            {% endif %}
+            {% if slug == "programmes" or slug == "courses" %}
+                <div class="content-actions">
+                    <a class="content-button" href="{% url 'enrolment' %}">Ask about enrolment</a>
+                    <a class="content-button content-button-secondary" href="{% url 'payments' %}">Fees and payments</a>
+                </div>
+            {% endif %}
+            {% if slug == "enrolment" %}
+                <div class="content-actions">
+                    <a class="content-button" href="{% url 'register' %}">Create a free account</a>
+                    <a class="content-button content-button-secondary" href="{% url 'contact' %}">Contact the academy</a>
+                </div>
+            {% endif %}
+            {% if slug == "sitemap" %}
+                <section class="content-section">
+                    <h2>Explore the site</h2>
+                    <ul class="sitemap-list">
+                        {% for link in sitemap_links %}
+                            <li><a href="{{ link.url }}">{{ link.label }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </section>
+            {% endif %}
+            {% if slug == "terms" %}
+                <section class="content-section">
+                    <h2>Student policies</h2>
+                    <ul class="sitemap-list">
+                        {% for link in policy_links %}
+                            <li><a href="{{ link.url }}">{{ link.label }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </section>
+            {% endif %}
+        </article>
+    </main>
+    <footer class="content-footer">
+        <p>&copy; {% now "Y" %} Tech-Nexus Academy</p>
+        <nav aria-label="Policies and help">
+            <a href="{% url 'courses' %}">Courses</a>
+            <a href="{% url 'programmes' %}">Programmes</a>
+            <a href="{% url 'enrolment' %}">Enrolment</a>
+            <a href="{% url 'payments' %}">Payments</a>
+            <a href="{% url 'register' %}">Register</a>
+            <a href="{% url 'login' %}">Sign in</a>
+            <a href="{% url 'privacy' %}">Privacy</a>
+            <a href="{% url 'terms' %}">Terms</a>
+            <a href="{% url 'cookies' %}">Cookies</a>
+            <a href="{% url 'support' %}">Support</a>
+            <a href="{% url 'enrolment_agreement' %}">Enrolment agreement</a>
+            <a href="{% url 'refunds' %}">Refunds</a>
+            <a href="{% url 'attendance' %}">Attendance</a>
+            <a href="{% url 'code_of_conduct' %}">Code of conduct</a>
+            <a href="{% url 'certificates' %}">Certificates</a>
+            <a href="{% url 'student_projects' %}">Student projects</a>
+            <a href="{% url 'acceptable_use' %}">Acceptable use</a>
+            <a href="{% url 'sitemap' %}">Sitemap</a>
+        </nav>
+    </footer>
+    {% if slug == "contact" %}
+        <script src="{% static 'Nexus/contact.js' %}" defer></script>
+    {% endif %}
+    {% include "Nexus/ai_chat_widget.html" %}
+</body>
+</html>

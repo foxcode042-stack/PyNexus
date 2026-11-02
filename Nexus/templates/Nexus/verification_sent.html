@@ -1,0 +1,81 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify your email | Tech-Nexus Academy</title>
+    <link rel="icon" type="image/jpeg" href="{% static 'Nexus/tech-nexus-logo.jpg' %}">
+    <link rel="stylesheet" href="{% static 'Nexus/index.css' %}">
+    <link rel="stylesheet" href="{% static 'Nexus/ai_tutor.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap">
+</head>
+<body class="content-page">
+    <header class="content-header">
+        <a class="content-brand" href="{% url 'home' %}">
+            <img src="{% static 'Nexus/tech-nexus-logo.jpg' %}" alt="">
+            <span class="content-brand-name">TECH-NEXUS <small>ACADEMY</small></span>
+        </a>
+        <nav class="content-nav" aria-label="Main navigation">
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'courses' %}">Courses</a>
+            <a href="{% url 'support' %}">Support</a>
+        </nav>
+    </header>
+    <main class="content-main account-main">
+        <section class="content-card account-card verification-card">
+            <p class="content-eyebrow">One more step</p>
+            <h1>Enter your email code</h1>
+            {% if verification_email %}
+                <p class="content-intro">A one-time code was sent to {{ verification_email }}. Enter it below to verify your account or finish signing in.</p>
+            {% else %}
+                <p class="content-intro">Enter the email address linked to your account and the one-time code we sent you.</p>
+            {% endif %}
+            {% for message in messages %}<p class="account-message" role="status">{{ message }}</p>{% endfor %}
+            <p class="account-message" data-auth-feedback role="status" hidden></p>
+            <form method="post" class="account-form" data-auth-code-form>
+                {% csrf_token %}
+                {% if verification_email %}
+                    <input type="hidden" name="email" value="{{ verification_email }}">
+                {% else %}
+                    <div class="account-field">
+                        <label for="verification-email">Email address</label>
+                        <input id="verification-email" name="email" type="email" autocomplete="email" required>
+                    </div>
+                {% endif %}
+                <div class="account-field">
+                    <label for="email-verification-code">Email verification code</label>
+                    <input id="email-verification-code" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required>
+                </div>
+                <button class="content-button" type="submit">Verify and continue</button>
+                <button class="account-secondary-link" type="button" data-auth-resend>Send a new code</button>
+            </form>
+            <noscript>
+                <form method="post" action="{% url 'resend_verification' %}" class="account-form">
+                    {% csrf_token %}
+                    {% if verification_email %}
+                        <input type="hidden" name="email" value="{{ verification_email }}">
+                    {% else %}
+                        <label class="account-field">
+                            <span>Email address</span>
+                            <input name="email" type="email" autocomplete="email" required>
+                        </label>
+                    {% endif %}
+                    <button class="account-secondary-link" type="submit">Send a new code</button>
+                </form>
+            </noscript>
+            <p class="dashboard-notice">If you are developing locally, the configured console email backend prints the message in the server terminal. Production email delivery requires SMTP settings.</p>
+            <a class="content-button" href="{% url 'login' %}">Go to sign in</a>
+        </section>
+    </main>
+    <footer class="content-footer">
+        <p>Tech-Nexus Academy</p>
+        <nav aria-label="Policies">
+            <a href="{% url 'privacy' %}">Privacy</a>
+            <a href="{% url 'terms' %}">Terms</a>
+        </nav>
+    </footer>
+    <script src="{% static 'Nexus/auth.js' %}" defer></script>
+    {% include "Nexus/ai_chat_widget.html" %}
+</body>
+</html>

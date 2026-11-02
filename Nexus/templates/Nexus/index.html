@@ -1,0 +1,1321 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="-KRHK9eCFlLWJkgM5qldGsTkLCafFwyqfJJkl4PX5D4" />
+    <title>Tech-Nexus Academy - Learn to Code in Calabar</title>
+    <meta name="description"
+        content="Tech-Nexus Academy offers practical technology education and programming programmes in Calabar, Nigeria.">
+    <link rel="icon" type="image/jpeg" href="{% static 'Nexus/tech-nexus-logo.jpg' %}">
+    <link rel="stylesheet" href="{% static 'Nexus/index.css' %}">
+    <link rel="stylesheet" href="{% static 'Nexus/ai_tutor.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&amp;display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="theme-color" content="#4169e1">
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "EducationalOrganization",
+      "name": "Tech-Nexus Academy",
+      "description": "Coding academy in Calabar offering online and offline programming courses.",
+      "url": "https://technonexusacademy.tech",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Calabar",
+        "addressRegion": "Cross River",
+        "addressCountry": "NG"
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer service",
+        "email": "technonexusacademy@gmail.com"
+      },
+      "course": [
+        {"@type": "Course", "name": "Programming Fundamentals", "courseDuration": "P3M"},
+        {"@type": "Course", "name": "Full Stack Development", "courseDuration": "P1Y"}
+      ]
+    }
+    </script>
+</head>
+
+<body>
+
+    <div class="cookie-banner" id="cookie-banner" aria-live="polite">
+        <div class="cookie-banner__content">
+            <div>
+                <strong>Cookie notice</strong>
+                <p>We use cookies to remember your session, improve your experience, and power the personal study area. By continuing to browse, you agree to our <a href="{% url 'cookies' %}">cookies policy</a>.</p>
+            </div>
+            <div class="cookie-banner__actions">
+                <button type="button" class="cookie-btn cookie-btn--primary" data-cookie-accept>Accept cookies</button>
+                <button type="button" class="cookie-btn cookie-btn--secondary" data-cookie-dismiss>Dismiss</button>
+            </div>
+        </div>
+    </div>
+
+    <button class="back-to-top" id="back-to-top" aria-label="Back to top" title="Back to top" type="button"
+        onclick="window.scrollTo({top: 0, behavior: 'smooth'}); document.body.scrollTop = 0; document.documentElement.scrollTop = 0;">↑</button>
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="{% url 'home' %}" class="nav-logo">
+                <img src="{% static 'Nexus/tech-nexus-logo.jpg' %}" alt="">
+                <span>TECH-NEXUS</span>
+            </a>
+            <ul class="nav-menu" id="nav-menu" role="menubar">
+                <li role="none">
+                    <a href="#home" class="nav-link active" role="menuitem"><i class="fas fa-home"></i> Home</a>
+                </li>
+                <li role="none">
+                    <a href="{% url 'courses' %}" class="nav-link" role="menuitem"><i class="fas fa-code"></i> Courses</a>
+                </li>
+                <li role="none">
+                    <a href="{% url 'about' %}" class="nav-link" role="menuitem"><i class="fas fa-info-circle"></i> About</a>
+                </li>
+
+                <li role="none">
+                    <a href="{% url 'blog' %}" class="nav-link" role="menuitem"><i class="fas fa-blog"></i>
+                        Blogs</a>
+                </li>
+
+                <li role="none">
+                    <a href="{% url 'contact' %}" class="nav-link" role="menuitem"><i class="fas fa-envelope"></i> Contact</a>
+                </li>
+                <li role="none">
+                    <a href="{% url 'login' %}" class="nav-link" role="menuitem"><i class="fas fa-user"></i> Sign in</a>
+                </li>
+
+                <li role="none">
+                    <a href="#" class="nav-link dropdown-toggle" role="menuitem" aria-haspopup="true"
+                        aria-expanded="false">
+                        <i class="fas fa-compass"></i> More
+                    </a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="{% url 'programmes' %}" class="dropdown-link">Programmes &amp; fees</a></li>
+                        <li><a href="{% url 'enrolment' %}" class="dropdown-link">Enrolment</a></li>
+                        <li><a href="{% url 'payments' %}" class="dropdown-link">Payments</a></li>
+                        <li><a href="{% url 'register' %}" class="dropdown-link">Create account</a></li>
+                        <li><a href="{% url 'dashboard' %}" class="dropdown-link">Student area</a></li>
+                        <li><button type="button" class="dropdown-link" data-open-ai-tutor>Ask Nexus AI</button></li>
+                        <li><a href="{% url 'careers' %}" class="dropdown-link">Careers</a></li>
+                        <li><a href="{% url 'faq' %}" class="dropdown-link">FAQ &amp; Help</a></li>
+                        <li><a href="{% url 'support' %}" class="dropdown-link">Support</a></li>
+                        <li><a href="{% url 'sitemap' %}" class="dropdown-link">Sitemap</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <button class="hamburger" id="hamburger" type="button" aria-label="Open navigation menu"
+                aria-controls="nav-menu" aria-expanded="false">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+            <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark theme"
+                title="Switch to dark theme">
+                <i class="fas fa-moon" aria-hidden="true"></i>
+            </button>
+        </div>
+    </nav>
+
+    <dialog class="welcome-dialog" id="welcome-dialog" aria-labelledby="welcome-title">
+        <div class="welcome-dialog-content">
+            <button class="welcome-dialog-close" type="button" aria-label="Close welcome guide"
+                data-welcome-close>&times;</button>
+            <span class="welcome-dialog-eyebrow">Tech-Nexus Academy · Calabar</span>
+            <h2 id="welcome-title">Build your future in tech.</h2>
+            <p>Explore practical technology learning, meet the academy, or find the information you need.</p>
+            <nav class="welcome-page-links" aria-label="Explore the academy">
+                <a href="{% url 'courses' %}">Courses</a>
+                <a href="{% url 'programmes' %}">Programmes</a>
+                <a href="{% url 'enrolment' %}">Enrolment</a>
+                <a href="{% url 'payments' %}">Payments</a>
+                <a href="{% url 'register' %}">Create account</a>
+                <a href="{% url 'login' %}">Sign in</a>
+                <a href="{% url 'dashboard' %}">Student area</a>
+                <a href="{% url 'about' %}">About</a>
+                <a href="{% url 'contact' %}">Contact</a>
+                <a href="{% url 'blog' %}">Blog</a>
+                <a href="{% url 'careers' %}">Careers</a>
+                <a href="{% url 'faq' %}">FAQ</a>
+                <a href="{% url 'help' %}">Help</a>
+                <a href="{% url 'support' %}">Support</a>
+                <a href="{% url 'privacy' %}">Privacy</a>
+                <a href="{% url 'terms' %}">Terms</a>
+                <a href="{% url 'cookies' %}">Cookies</a>
+                <a href="{% url 'sitemap' %}">Sitemap</a>
+            </nav>
+            <button class="welcome-dialog-continue" type="button" data-welcome-close>Explore the home page</button>
+            <p class="welcome-dialog-note">This guide appears only on your first visit to this browser.</p>
+        </div>
+    </dialog>
+
+    <section id="home" class="hero">
+        <div class="hero-bg">
+            <div class="hero-scene" aria-hidden="true"></div>
+        </div>
+        <div class="hero-shell">
+            <div class="hero-content">
+                <span class="hero-eyebrow"><span class="hero-eyebrow-dot"></span> Technology learning, made practical</span>
+                <h1 class="hero-title">Learn to code.<br><span class="highlight">Build what’s next.</span></h1>
+                <p class="hero-sub">
+                    Start with the fundamentals, make real projects, and grow your confidence with
+                    <span id="typewriter" aria-live="polite">web development</span>.
+                </p>
+                <div class="hero-buttons">
+                    <a href="{% url 'courses' %}" class="btn btn-primary">Explore courses <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+                    <a href="{% url 'about' %}" class="btn btn-secondary">Discover the academy</a>
+                </div>
+                <div class="hero-proof">
+                    <span><i class="fas fa-code" aria-hidden="true"></i> Learn by building</span>
+                    <span><i class="fas fa-location-dot" aria-hidden="true"></i> Calabar, Nigeria</span>
+                </div>
+            </div>
+            <div class="hero-visual" aria-label="A developer working at a computer">
+                <div class="hero-image-frame">
+                    <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&amp;fit=crop&amp;w=1200&amp;q=85"
+                        alt="Laptop displaying a code editor on a developer's desk" fetchpriority="high">
+                </div>
+                <div class="hero-code-card" aria-hidden="true">
+                    <div class="hero-code-top"><span></span><span></span><span></span><small>hello_world.py</small></div>
+                    <code><b>def</b> build_future():<br>&nbsp;&nbsp;<em>return</em> "your next idea"</code>
+                </div>
+                <div class="hero-float-card">
+                    <span class="hero-float-icon"><i class="fas fa-terminal" aria-hidden="true"></i></span>
+                    <span><strong>Learn by doing</strong><small>One project at a time</small></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="section about-section">
+        <div class="about-bg-text">TECH-NEXUS</div>
+        <div class="about-bg-text alt">CODE &bull; BUILD &bull;
+            DEPLOY</div>
+        <div class="container about-container">
+            <div class="about-header">
+                <span class="about-badge"><i class="fas fa-award"></i>
+                Knowledge · Connection · Advancement</span>
+                <h2 class="section-title about-title">About Tech-Nexus
+                    Academy</h2>
+                <p class="about-lead">Learn. Build. Advance. Turn curiosity into practical skills and useful digital projects.</p>
+            </div>
+
+            <div class="learning-image-row" aria-label="Programming and technology learning">
+                <figure class="learning-image-card">
+                    <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&amp;fit=crop&amp;w=900&amp;q=80"
+                        alt="A team collaborating around computers" loading="lazy">
+                    <figcaption>Build together</figcaption>
+                </figure>
+                <figure class="learning-image-card">
+                    <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&amp;fit=crop&amp;w=900&amp;q=80"
+                        alt="A learner working through an online course" loading="lazy">
+                    <figcaption>Keep exploring</figcaption>
+                </figure>
+                <figure class="learning-image-card">
+                    <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&amp;fit=crop&amp;w=900&amp;q=80"
+                        alt="Close-up of a circuit board and electronic components" loading="lazy">
+                    <figcaption>Understand the technology</figcaption>
+                </figure>
+            </div>
+
+            <div class="about-content-grid">
+                <div class="about-story">
+                    <h3><i class="fas fa-book-open"></i> Our Story</h3>
+                    <p>Tech-Nexus Academy is a technology education venture focused
+                        on helping beginners develop practical programming and
+                        software development skills.</p>
+                    <p>Our mission is to provide accessible, structured,
+                        practical technology education that helps learners
+                        progress from programming fundamentals to software
+                        development and real-world projects.</p>
+                    <p>Online and physical classes, structured learning paths,
+                        and portfolio projects are part of the academy's plans.
+                        Confirm current offerings, schedules, and requirements
+                        before enrolling.</p>
+                </div>
+                <div class="about-mv">
+                    <div class="mv-card mission">
+                        <div class="mv-icon"><i class="fas fa-rocket"></i></div>
+                        <h4>Our Mission</h4>
+                        <p>Make practical technology education accessible and
+                            help learners advance from fundamentals to useful
+                            digital products.</p>
+                    </div>
+                    <div class="mv-card vision">
+                        <div class="mv-icon"><i class="fas fa-eye"></i></div>
+                        <h4>Our Vision</h4>
+                        <p>Become a trusted technology learning community where
+                            aspiring developers build skills and contribute to
+                            the digital world.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="about-features">
+                <h3 class="features-title">Our planned learning approach</h3>
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                        <h4>Guided learning</h4>
+                        <p>Mentorship and instruction are planned; instructor
+                            details will be shared for each cohort.</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="fas fa-project-diagram"></i></div>
+                        <h4>Practical projects</h4>
+                        <p>Project-based practice is a core part of the
+                            academy's intended learning approach.</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="fas fa-wifi"></i></div>
+                        <h4>Flexible formats</h4>
+                        <p>Online and physical classes are planned; confirm
+                            availability for the cohort you are considering.</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="fas fa-user-friends"></i></div>
+                        <h4>Supportive community</h4>
+                        <p>Collaboration and a supportive learning community
+                            are among the academy's stated values.</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="fas fa-handshake"></i></div>
+                        <h4>Professional readiness</h4>
+                        <p>Career preparation is a planned programme area;
+                            outcomes and services are not guaranteed.</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="fas fa-infinity"></i></div>
+                        <h4>Learning resources</h4>
+                        <p>Material access and duration depend on the final
+                            programme terms and should be confirmed before enrollment.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="courses" class="section courses-section">
+        <div class="courses-bg-code">&lt;/&gt;</div>
+        <div class="courses-bg-code alt">{ }</div>
+        <div class="container courses-container">
+            <div class="courses-header">
+                <span class="courses-badge"><i class="fas fa-code"></i>
+                    Planned technology areas</span>
+                <h2 class="section-title courses-title">Our Courses
+                    &amp; Pricing</h2>
+                <p class="courses-lead">Explore planned learning areas, then contact us to confirm the curriculum and cohort availability. Course lengths and project counts shown below are draft examples, not confirmed promises.</p>
+            </div>
+
+            <!-- Course Category Tabs -->
+            <div class="course-tabs">
+                <button class="course-tab active" data-category="all"><i class="fas fa-th-large"></i> All</button>
+                <button class="course-tab" data-category="web"><i class="fas fa-globe"></i> Web Dev</button>
+                <button class="course-tab" data-category="mobile"><i class="fas fa-mobile-alt"></i> Mobile</button>
+                <button class="course-tab" data-category="backend"><i class="fas fa-server"></i> Backend</button>
+                <button class="course-tab" data-category="systems"><i class="fas fa-microchip"></i> Systems</button>
+            </div>
+
+            <!-- Course Cards Grid -->
+            <div class="course-cards-grid" id="course-cards-grid">
+                <div class="course-card" data-category="web">
+                    <div class="course-card-glow html-glow"></div>
+                    <div class="course-card-inner">
+                        <div class="course-card-header">
+                            <div class="course-icon html-icon"><i class="fab fa-html5"></i></div>
+                            <span class="course-level beginner">Beginner</span>
+                        </div>
+                        <h3>HTML &amp; CSS</h3>
+                        <p>Build responsive, accessible websites from
+                            scratch. Master semantic markup, flexbox,
+                            grid, and modern CSS animations.</p>
+                        <div class="course-meta">
+                            <span><i class="fas fa-clock"></i> 3
+                                Weeks</span>
+                            <span><i class="fas fa-project-diagram"></i>
+                                5 Projects</span>
+                        </div>
+                        <div class="course-tech">
+                            <span class="tech-tag">HTML5</span>
+                            <span class="tech-tag">CSS3</span>
+                            <span class="tech-tag">Flexbox</span>
+                            <span class="tech-tag">Grid</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card" data-category="web">
+                    <div class="course-card-glow js-glow"></div>
+                    <div class="course-card-inner">
+                        <div class="course-card-header">
+                            <div class="course-icon js-icon"><i class="fab fa-js"></i></div>
+                            <span class="course-level intermediate">Intermediate</span>
+                        </div>
+                        <h3>JavaScript</h3>
+                        <p>From DOM manipulation to async programming.
+                            Learn ES6+, APIs, and modern frameworks
+                            fundamentals.</p>
+                        <div class="course-meta">
+                            <span><i class="fas fa-clock"></i> 6
+                                Weeks</span>
+                            <span><i class="fas fa-project-diagram"></i>
+                                8 Projects</span>
+                        </div>
+                        <div class="course-tech">
+                            <span class="tech-tag">ES6+</span>
+                            <span class="tech-tag">DOM</span>
+                            <span class="tech-tag">Fetch API</span>
+                            <span class="tech-tag">Async/Await</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card" data-category="backend">
+                    <div class="course-card-glow python-glow"></div>
+                    <div class="course-card-inner">
+                        <div class="course-card-header">
+                            <div class="course-icon python-icon"><i class="fab fa-python"></i></div>
+                            <span class="course-level beginner">Beginner</span>
+                        </div>
+                        <h3>Python &amp; Django</h3>
+                        <p>Python basics to full-stack web apps with
+                            Django. Build scalable APIs, admin panels,
+                            and deploy to production.</p>
+                        <div class="course-meta">
+                            <span><i class="fas fa-clock"></i> 8
+                                Weeks</span>
+                            <span><i class="fas fa-project-diagram"></i>
+                                6 Projects</span>
+                        </div>
+                        <div class="course-tech">
+                            <span class="tech-tag">Python 3</span>
+                            <span class="tech-tag">Django</span>
+                            <span class="tech-tag">REST API</span>
+                            <span class="tech-tag">PostgreSQL</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card" data-category="backend">
+                    <div class="course-card-glow php-glow"></div>
+                    <div class="course-card-inner">
+                        <div class="course-card-header">
+                            <div class="course-icon php-icon"><i class="fab fa-php"></i></div>
+                            <span class="course-level intermediate">Intermediate</span>
+                        </div>
+                        <h3>PHP</h3>
+                        <p>Server-side scripting with PHP. Build dynamic
+                            websites, handle forms, sessions, and
+                            integrate with MySQL databases.</p>
+                        <div class="course-meta">
+                            <span><i class="fas fa-clock"></i> 6
+                                Weeks</span>
+                            <span><i class="fas fa-project-diagram"></i>
+                                5 Projects</span>
+                        </div>
+                        <div class="course-tech">
+                            <span class="tech-tag">PHP 8</span>
+                            <span class="tech-tag">MySQL</span>
+                            <span class="tech-tag">Laravel</span>
+                            <span class="tech-tag">Composer</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card" data-category="systems">
+                    <div class="course-card-glow java-glow"></div>
+                    <div class="course-card-inner">
+                        <div class="course-card-header">
+                            <div class="course-icon java-icon"><i class="fab fa-java"></i></div>
+                            <span class="course-level intermediate">Intermediate</span>
+                        </div>
+                        <h3>Java</h3>
+                        <p>Object-oriented programming with Java. Build
+                            Android apps, enterprise software, and
+                            master Spring Boot framework.</p>
+                        <div class="course-meta">
+                            <span><i class="fas fa-clock"></i> 10
+                                Weeks</span>
+                            <span><i class="fas fa-project-diagram"></i>
+                                7 Projects</span>
+                        </div>
+                        <div class="course-tech">
+                            <span class="tech-tag">Java 17</span>
+                            <span class="tech-tag">OOP</span>
+                            <span class="tech-tag">Spring Boot</span>
+                            <span class="tech-tag">Maven</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card" data-category="systems">
+                    <div class="course-card-glow cpp-glow"></div>
+                    <div class="course-card-inner">
+                        <div class="course-card-header">
+                            <div class="course-icon cpp-icon"><i class="fas fa-copyright"></i></div>
+                            <span class="course-level advanced">Advanced</span>
+                        </div>
+                        <h3>C &amp; C++</h3>
+                        <p>Systems programming fundamentals. Memory
+                            management, data structures, algorithms, and
+                            performance optimization.</p>
+                        <div class="course-meta">
+                            <span><i class="fas fa-clock"></i> 8
+                                Weeks</span>
+                            <span><i class="fas fa-project-diagram"></i>
+                                6 Projects</span>
+                        </div>
+                        <div class="course-tech">
+                            <span class="tech-tag">C99</span>
+                            <span class="tech-tag">C++17</span>
+                            <span class="tech-tag">STL</span>
+                            <span class="tech-tag">Pointers</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card" data-category="mobile">
+                    <div class="course-card-glow swift-glow"></div>
+                    <div class="course-card-inner">
+                        <div class="course-card-header">
+                            <div class="course-icon swift-icon"><i class="fab fa-swift"></i></div>
+                            <span class="course-level intermediate">Intermediate</span>
+                        </div>
+                        <h3>Swift</h3>
+                        <p>iOS app development with Swift and SwiftUI.
+                            Build native iPhone apps with beautiful UI
+                            and Core Data persistence.</p>
+                        <div class="course-meta">
+                            <span><i class="fas fa-clock"></i> 8
+                                Weeks</span>
+                            <span><i class="fas fa-project-diagram"></i>
+                                5 Projects</span>
+                        </div>
+                        <div class="course-tech">
+                            <span class="tech-tag">Swift 5</span>
+                            <span class="tech-tag">SwiftUI</span>
+                            <span class="tech-tag">Xcode</span>
+                            <span class="tech-tag">Core Data</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card" data-category="backend">
+                    <div class="course-card-glow go-glow"></div>
+                    <div class="course-card-inner">
+                        <div class="course-card-header">
+                            <div class="course-icon go-icon"><i class="fab fa-golang"></i></div>
+                            <span class="course-level advanced">Advanced</span>
+                        </div>
+                        <h3>Go (Golang)</h3>
+                        <p>High-performance backend services with Go.
+                            Concurrency, microservices, gRPC, and
+                            cloud-native development.</p>
+                        <div class="course-meta">
+                            <span><i class="fas fa-clock"></i> 6
+                                Weeks</span>
+                            <span><i class="fas fa-project-diagram"></i>
+                                4 Projects</span>
+                        </div>
+                        <div class="course-tech">
+                            <span class="tech-tag">Go 1.21</span>
+                            <span class="tech-tag">Goroutines</span>
+                            <span class="tech-tag">gRPC</span>
+                            <span class="tech-tag">Docker</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card" data-category="web">
+                    <div class="course-card-glow ruby-glow"></div>
+                    <div class="course-card-inner">
+                        <div class="course-card-header">
+                            <div class="course-icon ruby-icon"><i class="fas fa-gem"></i></div>
+                            <span class="course-level beginner">Beginner</span>
+                        </div>
+                        <h3>Ruby</h3>
+                        <p>Elegant, expressive programming with Ruby.
+                            Build web apps with Rails, write clean code,
+                            and master metaprogramming.</p>
+                        <div class="course-meta">
+                            <span><i class="fas fa-clock"></i> 6
+                                Weeks</span>
+                            <span><i class="fas fa-project-diagram"></i>
+                                5 Projects</span>
+                        </div>
+                        <div class="course-tech">
+                            <span class="tech-tag">Ruby 3</span>
+                            <span class="tech-tag">Rails 7</span>
+                            <span class="tech-tag">RSpec</span>
+                            <span class="tech-tag">Bundler</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card" data-category="systems">
+                    <div class="course-card-glow c-glow"></div>
+                    <div class="course-card-inner">
+                        <div class="course-card-header">
+                            <div class="course-icon c-icon"><i class="fas fa-microchip"></i></div>
+                            <span class="course-level advanced">Advanced</span>
+                        </div>
+                        <h3>Embedded C</h3>
+                        <p>Microcontroller programming for IoT and
+                            embedded systems. Arduino, Raspberry Pi, and
+                            real-time systems.</p>
+                        <div class="course-meta">
+                            <span><i class="fas fa-clock"></i> 8
+                                Weeks</span>
+                            <span><i class="fas fa-project-diagram"></i>
+                                6 Projects</span>
+                        </div>
+                        <div class="course-tech">
+                            <span class="tech-tag">Embedded C</span>
+                            <span class="tech-tag">Arduino</span>
+                            <span class="tech-tag">Raspberry Pi</span>
+                            <span class="tech-tag">IoT</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card" data-category="mobile">
+                    <div class="course-card-glow xml-glow"></div>
+                    <div class="course-card-inner">
+                        <div class="course-card-header">
+                            <div class="course-icon xml-icon"><i class="fas fa-code"></i></div>
+                            <span class="course-level beginner">Beginner</span>
+                        </div>
+                        <h3>XML &amp; JSON</h3>
+                        <p>Data interchange formats for modern apps.
+                            Parse, validate, transform, and integrate
+                            with RESTful APIs.</p>
+                        <div class="course-meta">
+                            <span><i class="fas fa-clock"></i> 2
+                                Weeks</span>
+                            <span><i class="fas fa-project-diagram"></i>
+                                3 Projects</span>
+                        </div>
+                        <div class="course-tech">
+                            <span class="tech-tag">XML</span>
+                            <span class="tech-tag">JSON</span>
+                            <span class="tech-tag">XSD</span>
+                            <span class="tech-tag">XPath</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card" data-category="web">
+                    <div class="course-card-glow react-glow"></div>
+                    <div class="course-card-inner">
+                        <div class="course-card-header">
+                            <div class="course-icon react-icon"><i class="fab fa-react"></i></div>
+                            <span class="course-level advanced">Advanced</span>
+                        </div>
+                        <h3>React &amp; Node.js</h3>
+                        <p>Full-stack JavaScript with React frontend and
+                            Node.js backend. Build modern SPAs with
+                            real-time features.</p>
+                        <div class="course-meta">
+                            <span><i class="fas fa-clock"></i> 10
+                                Weeks</span>
+                            <span><i class="fas fa-project-diagram"></i>
+                                8 Projects</span>
+                        </div>
+                        <div class="course-tech">
+                            <span class="tech-tag">React 18</span>
+                            <span class="tech-tag">Node.js</span>
+                            <span class="tech-tag">Express</span>
+                            <span class="tech-tag">MongoDB</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Duration Timeline -->
+            <div class="duration-section">
+                <h3 class="duration-title"><i class="fas fa-road"></i>
+                    Learning Paths</h3>
+                <p class="duration-subtitle">These are proposed programme durations and fees. Confirm current availability, learning outcomes, and terms with the academy before enrolling.</p>
+
+                <div class="duration-timeline">
+                    <div class="timeline-track">
+                        <div class="timeline-progress" id="timeline-progress"></div>
+                    </div>
+                    <div class="timeline-cards">
+                        <div class="timeline-card" data-step="1">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-duration">3
+                                    Months</div>
+                                <div class="timeline-price">₦60,000</div>
+                                <div class="timeline-badge starter">Starter</div>
+                                <ul class="timeline-features">
+                                    <li><i class="fas fa-check"></i> 2
+                                        Languages</li>
+                                    <li><i class="fas fa-check"></i>
+                                        Basic Projects</li>
+                                    <li><i class="fas fa-check"></i>
+                                        Group Sessions</li>
+                                    <li><i class="fas fa-check"></i>
+                                        Certificate</li>
+                                </ul>
+                                <a href="https://paystack.shop/pay/8bye9mv3x-" class="btn btn-enroll"
+                                    target="_blank" rel="noopener noreferrer">Open Paystack checkout</a>
+                            </div>
+                        </div>
+                        <div class="timeline-card active" data-step="2">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-duration">6
+                                    Months</div>
+                                <div class="timeline-price">₦125,000</div>
+                                <div class="timeline-badge popular">Professional</div>
+                                <ul class="timeline-features">
+                                    <li><i class="fas fa-check"></i> 4
+                                        Languages</li>
+                                    <li><i class="fas fa-check"></i>
+                                        Real-world Apps</li>
+                                    <li><i class="fas fa-check"></i>
+                                        1-on-1 Mentorship</li>
+                                    <li><i class="fas fa-check"></i>
+                                        Portfolio Review</li>
+                                </ul>
+                                <a href="https://paystack.shop/pay/b530lxy-d0" class="btn btn-enroll"
+                                    target="_blank" rel="noopener noreferrer">Open Paystack checkout</a>
+                            </div>
+                        </div>
+                        <div class="timeline-card" data-step="3">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-duration">9
+                                    Months</div>
+                                <div class="timeline-price">₦190,000</div>
+                                <div class="timeline-badge advanced">Advanced</div>
+                                <ul class="timeline-features">
+                                    <li><i class="fas fa-check"></i> 6
+                                        Languages</li>
+                                    <li><i class="fas fa-check"></i>
+                                        Full Portfolio</li>
+                                    <li><i class="fas fa-check"></i>
+                                        Career Coaching</li>
+                                    <li><i class="fas fa-check"></i>
+                                        Internship Prep</li>
+                                </ul>
+                                <a href="https://paystack.shop/pay/d68lxuvltv" class="btn btn-enroll"
+                                    target="_blank" rel="noopener noreferrer">Open Paystack checkout</a>
+                            </div>
+                        </div>
+                        <div class="timeline-card" data-step="4">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-duration">1
+                                    Year</div>
+                                <div class="timeline-price">₦250,000</div>
+                                <div class="timeline-badge mastery">Mastery</div>
+                                <ul class="timeline-features">
+                                    <li><i class="fas fa-check"></i> All
+                                        Languages</li>
+                                    <li><i class="fas fa-check"></i>
+                                        Enterprise Projects</li>
+                                    <li><i class="fas fa-check"></i> Job
+                                        Placement</li>
+                                    <li><i class="fas fa-check"></i>
+                                        Lifetime Alumni</li>
+                                </ul>
+                                <a href="https://paystack.shop/pay/ejfmyk0uig" class="btn btn-enroll"
+                                    target="_blank" rel="noopener noreferrer">Open Paystack checkout</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comparison Table -->
+            <div class="comparison-section">
+                <h3 class="comparison-title"><i class="fas fa-balance-scale"></i> Compare
+                    Plans</h3>
+                <div class="comparison-table-wrapper">
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>3 Months</th>
+                                <th class="highlight-col">6 Months</th>
+                                <th>9 Months</th>
+                                <th>1 Year</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><i class="fas fa-book"></i>
+                                    Languages Covered</td>
+                                <td>2</td>
+                                <td class="highlight-col">4</td>
+                                <td>6</td>
+                                <td>12+</td>
+                            </tr>
+                            <tr>
+                                <td><i class="fas fa-project-diagram"></i>
+                                    Projects</td>
+                                <td>4</td>
+                                <td class="highlight-col">8</td>
+                                <td>12</td>
+                                <td>20+</td>
+                            </tr>
+                            <tr>
+                                <td><i class="fas fa-user-tie"></i>
+                                    Mentorship (proposed)</td>
+                                <td>Group</td>
+                                <td class="highlight-col">1-on-1
+                                    Weekly</td>
+                                <td>1-on-1 Daily</td>
+                                <td>Dedicated Mentor</td>
+                            </tr>
+                            <tr>
+                                <td><i class="fas fa-certificate"></i>
+                                    Weekly study hours (proposed)</td>
+                                <td>8</td>
+                                <td class="highlight-col">12</td>
+                                <td>16</td>
+                                <td>20</td>
+                            </tr>
+                            <tr>
+                                <td><i class="fas fa-users"></i> Batch size (proposed)</td>
+                                <td>20</td>
+                                <td class="highlight-col">15</td>
+                                <td>10</td>
+                                <td>5 (Elite)</td>
+                            </tr>
+                            <tr>
+                                <td><i class="fas fa-infinity"></i>
+                                    Learning materials (proposed)</td>
+                                <td>6 Months</td>
+                                <td class="highlight-col">1 Year</td>
+                                <td>2 Years</td>
+                                <td>Lifetime</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Gallery -->
+            <h3 class="gallery-section-title"><i class="fas fa-images"></i> Our Classes in
+                Action</h3>
+            <div class="courses-gallery">
+                <div class="gallery-item">
+                    <img class="gallery-photo" src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&amp;fit=crop&amp;w=700&amp;q=75"
+                        alt="Laptop displaying a code editor" loading="lazy">
+                    <div class="gallery-overlay">
+                        <i class="fas fa-expand"></i>
+                        <span>Live Coding Session</span>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <img class="gallery-photo" src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&amp;fit=crop&amp;w=700&amp;q=75"
+                        alt="Team working together at computers" loading="lazy">
+                    <div class="gallery-overlay">
+                        <i class="fas fa-expand"></i>
+                        <span>Team Collaboration</span>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <img class="gallery-photo" src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&amp;fit=crop&amp;w=700&amp;q=75"
+                        alt="Learners collaborating on a technology project" loading="lazy">
+                    <div class="gallery-overlay">
+                        <i class="fas fa-expand"></i>
+                        <span>Workshop Event</span>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <img class="gallery-photo" src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&amp;fit=crop&amp;w=700&amp;q=75"
+                        alt="Circuit board and electronic components" loading="lazy">
+                    <div class="gallery-overlay">
+                        <i class="fas fa-expand"></i>
+                        <span>Explore technology</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="testimonials" class="section testimonials-section">
+        <div class="container">
+            <div class="project-showcase-heading">
+                <div>
+                    <span class="about-badge"><i class="fas fa-lightbulb" aria-hidden="true"></i> Learn by making</span>
+                    <h2 class="section-title">Ideas worth building</h2>
+                    <p class="section-subtitle">A few project prompts to help you picture what you can create as your skills grow.</p>
+                </div>
+                <div class="carousel-controls" aria-label="Project idea carousel controls">
+                    <button class="carousel-control" type="button" data-carousel-prev aria-label="Previous project idea">
+                        <i class="fas fa-arrow-left" aria-hidden="true"></i>
+                    </button>
+                    <button class="carousel-control" type="button" data-carousel-next aria-label="Next project idea">
+                        <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="project-carousel" id="project-carousel" tabindex="0"
+                aria-label="Project ideas. Use the arrow keys to change slides." aria-live="polite">
+                <article class="project-slide is-active">
+                    <div class="project-slide-image">
+                        <img src="https://images.unsplash.com/photo-1559028012-481c04fa702d?auto=format&amp;fit=crop&amp;w=1000&amp;q=80"
+                            alt="A designer sketching a digital product interface" loading="lazy">
+                    </div>
+                    <div class="project-slide-copy">
+                        <span class="project-slide-number">01 / 03</span>
+                        <h3>A personal portfolio</h3>
+                        <p>Bring together your skills, projects, and story in a responsive site using HTML, CSS, and JavaScript.</p>
+                        <span class="project-slide-tag">Web foundations</span>
+                    </div>
+                </article>
+                <article class="project-slide">
+                    <div class="project-slide-image">
+                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&amp;fit=crop&amp;w=1000&amp;q=80"
+                            alt="Analytics charts on a computer display" loading="lazy">
+                    </div>
+                    <div class="project-slide-copy">
+                        <span class="project-slide-number">02 / 03</span>
+                        <h3>A useful data dashboard</h3>
+                        <p>Turn sample data into a clear dashboard and practice presenting information with a Python-backed app.</p>
+                        <span class="project-slide-tag">Python &amp; Django</span>
+                    </div>
+                </article>
+                <article class="project-slide">
+                    <div class="project-slide-image">
+                        <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&amp;fit=crop&amp;w=1000&amp;q=80"
+                            alt="Close-up of electronic components on a circuit board" loading="lazy">
+                    </div>
+                    <div class="project-slide-copy">
+                        <span class="project-slide-number">03 / 03</span>
+                        <h3>A small automation tool</h3>
+                        <p>Solve a repetitive everyday task with a focused script, then improve it with thoughtful inputs and feedback.</p>
+                        <span class="project-slide-tag">Programming practice</span>
+                    </div>
+                </article>
+            </div>
+            <div class="carousel-dots" role="group" aria-label="Choose a project idea">
+                <button class="carousel-dot is-active" type="button" data-carousel-slide="0" aria-label="Show project idea 1" aria-current="true"></button>
+                <button class="carousel-dot" type="button" data-carousel-slide="1" aria-label="Show project idea 2"></button>
+                <button class="carousel-dot" type="button" data-carousel-slide="2" aria-label="Show project idea 3"></button>
+            </div>
+            <p class="testimonial-note">We’ll publish real student projects or testimonials here only when learners have provided content and approved it for sharing.</p>
+        </div>
+    </section>
+
+    <section id="schedule" class="section schedule-section">
+        <div class="schedule-bg-text">SCHEDULE</div>
+        <div class="container schedule-container">
+            <div class="schedule-header">
+                <span class="schedule-badge"><i class="fas fa-calendar-alt"></i> Plan Your
+                    Learning</span>
+                <h2 class="section-title schedule-title">Class
+                    Schedule</h2>
+                <p class="schedule-lead">Class dates, session times, and online or in-person availability are confirmed for each cohort. Contact the academy for the current schedule.</p>
+            </div>
+
+            <div class="schedule-timeline">
+                <div class="schedule-track">
+                    <div class="schedule-progress" id="schedule-progress"></div>
+                </div>
+                <div class="schedule-grid">
+                    <div class="schedule-card" data-step="1">
+                        <div class="schedule-icon-bubble">
+                            <i class="fas fa-calendar-day"></i>
+                        </div>
+                        <div class="schedule-content">
+                            <h3>Class Days</h3>
+                            <p class="schedule-value">Cohort based</p>
+                            <p class="schedule-desc">Ask the academy for dates for the next available cohort.</p>
+                        </div>
+                    </div>
+                    <div class="schedule-card" data-step="2">
+                        <div class="schedule-icon-bubble">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="schedule-content">
+                            <h3>Class Hours</h3>
+                            <p class="schedule-value">To be confirmed</p>
+                            <p class="schedule-desc">Session hours are shared when a cohort is confirmed.</p>
+                        </div>
+                    </div>
+                    <div class="schedule-card" data-step="3">
+                        <div class="schedule-icon-bubble">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="schedule-content">
+                            <h3>Location</h3>
+                            <p class="schedule-value">UNICAL,
+                                Calabar</p>
+                            <p class="schedule-desc">Contact the academy to confirm the current in-person venue.</p>
+                        </div>
+                    </div>
+                    <div class="schedule-card" data-step="4">
+                        <div class="schedule-icon-bubble">
+                            <i class="fas fa-laptop-house"></i>
+                        </div>
+                        <div class="schedule-content">
+                            <h3>Delivery Mode</h3>
+                            <p class="schedule-value">Online &
+                                Offline</p>
+                            <p class="schedule-desc">Online and physical classes are planned; confirm current availability before enrolling.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="schedule-cta">
+                <div class="cta-card">
+                    <div class="cta-icon"><i class="fas fa-rocket"></i></div>
+                    <div class="cta-text">
+                        <h4>Ask about the next cohort</h4>
+                        <p>Contact the academy to confirm whether enrollment is open and review current programme details.</p>
+                    </div>
+                    <a href="{% url 'contact' %}" class="btn btn-enroll">Enroll
+                        Now</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="section contact-section">
+        <div class="contact-bg-text">CONTACT</div>
+        <div class="container contact-container">
+            <div class="contact-header">
+                <span class="contact-badge"><i class="fas fa-paper-plane"></i> Get In
+                    Touch</span>
+                <h2 class="section-title contact-title">Contact Us</h2>
+                <p class="contact-lead">Have questions about courses,
+                    enrollment, or partnerships? We'd love to hear from
+                    you.</p>
+            </div>
+
+            <div class="contact-grid">
+                <!-- Left: Contact Info Panel -->
+                <div class="contact-info-panel">
+                    <div class="contact-card">
+                        <div class="contact-card-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="contact-card-content">
+                            <h4>Email</h4>
+                            <a href="mailto:technonexusacademy@gmail.com">technonexusacademy@gmail.com</a>
+                        </div>
+                    </div>
+
+                    <div class="contact-card">
+                        <div class="contact-card-icon">
+                            <i class="fab fa-whatsapp"></i>
+                        </div>
+                        <div class="contact-card-content">
+                            <h4>WhatsApp</h4>
+                            <a rel="noopener" href="https://wa.me/2349039759275" target="_blank">+234 903 975 9275</a>
+                        </div>
+                    </div>
+
+                    <div class="contact-card">
+                        <div class="contact-card-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="contact-card-content">
+                            <h4>Location</h4>
+                            <p>University of Calabar, Calabar,
+                                Nigeria</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-card">
+                        <div class="contact-card-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="contact-card-content">
+                            <h4>Office Hours</h4>
+                            <p>Mon - Fri: 8AM - 5PM</p>
+                        </div>
+                    </div>
+
+                    <div class="social-links">
+                        <a rel="noopener" href="https://web.facebook.com/profile.php?id=61573297221295" target="_blank"
+                            class="social-link" aria-label="Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a rel="noopener" href="https://www.instagram.com/technonexusacademy/" target="_blank"
+                            class="social-link" aria-label="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a rel="noopener" href="https://wa.me/2349039759275" target="_blank" class="social-link"
+                            aria-label="WhatsApp">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                        <a rel="noopener" href="https://vm.tiktok.com/ZS9Nr68Md1573-OtmNQ/" target="_blank"
+                            class="social-link" aria-label="TikTok">
+                            <i class="fab fa-tiktok"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Right: Contact Form Panel -->
+                <div class="contact-form-panel">
+                    <form class="contact-form-advanced" id="contact-form" data-contact-email="technonexusacademy@gmail.com">
+                        <p class="contact-form-note">Submitting this form opens your email app with a prepared message. No message is sent or stored by this website.</p>
+                        <div class="form-row">
+                            <div class="form-group floating-label">
+                                    <input type="text" id="contact-name" name="name" autocomplete="name" placeholder=" " required>
+                                <label for="contact-name">Your
+                                    Name</label>
+                                <span class="input-border"></span>
+                            </div>
+                            <div class="form-group floating-label">
+                                <input type="email" id="contact-email" name="email" autocomplete="email" placeholder=" " required>
+                                <label for="contact-email">Your
+                                    Email</label>
+                                <span class="input-border"></span>
+                            </div>
+                        </div>
+                        <div class="form-group floating-label">
+                            <input type="text" id="contact-subject" name="subject" placeholder=" " required>
+                            <label for="contact-subject">Subject</label>
+                            <span class="input-border"></span>
+                        </div>
+                        <div class="form-group floating-label">
+                            <textarea id="contact-message" name="message" placeholder=" " rows="5" required></textarea>
+                            <label for="contact-message">Your
+                                Message</label>
+                            <span class="input-border"></span>
+                        </div>
+                        <button type="submit" class="btn btn-submit" id="contact-submit">
+                            <span class="btn-text">Send Message</span>
+                            <span class="btn-icon"><i class="fas fa-paper-plane"></i></span>
+                            <span class="btn-loader"><i class="fas fa-spinner fa-spin"></i></span>
+                            <span class="btn-success"><i class="fas fa-check"></i>
+                                Sent!</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Advanced Footer -->
+    <footer class="footer" id="footer">
+        <!-- Newsletter Band -->
+        <div class="footer-newsletter">
+            <div class="container">
+                <div class="newsletter-content">
+                    <div class="newsletter-text">
+                        <h3><i class="fas fa-paper-plane"></i> Subscribe
+                            to Our Newsletter</h3>
+                        <p>Get the latest coding tips, course updates,
+                            and tech news delivered to your inbox.</p>
+                    </div>
+                    <form class="newsletter-form" id="newsletter-form">
+                        <div class="newsletter-input-group">
+                            <input type="email" placeholder="Enter your email" required id="newsletter-email">
+                            <button type="submit" class="btn btn-newsletter">
+                                <span class="btn-text">Subscribe</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                        <span class="newsletter-success" id="newsletter-success"><i class="fas fa-check-circle"></i>
+                            Subscribed successfully!</span>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Footer Grid -->
+        <div class="footer-main">
+            <div class="container">
+                <div class="footer-grid">
+                    <!-- Brand Column -->
+                    <div class="footer-col brand-col">
+                        <a href="{% url 'home' %}" class="footer-brand-link">
+                        <img class="footer-logo-img" src="{% static 'Nexus/tech-nexus-logo.jpg' %}" alt="">
+                        <span class="footer-brand-name">Tech-Nexus</span>
+                        </a>
+                        <p class="footer-desc">Empowering the next
+                            generation of African developers with
+                            world-class coding education. From Calabar
+                            to the world.</p>
+                        <div class="footer-socials">
+                            <a rel="noopener" href="https://web.facebook.com/profile.php?id=61573297221295"
+                                target="_blank" class="footer-social" aria-label="Facebook">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a rel="noopener" href="https://www.instagram.com/technonexusacademy/" target="_blank"
+                                class="footer-social" aria-label="Instagram">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a rel="noopener" href="https://wa.me/2349039759275" target="_blank" class="footer-social"
+                                aria-label="WhatsApp">
+                                <i class="fab fa-whatsapp"></i>
+                            </a>
+                            <a rel="noopener" href="https://vm.tiktok.com/ZS9Nr68Md1573-OtmNQ/" target="_blank"
+                                class="footer-social" aria-label="TikTok">
+                                <i class="fab fa-tiktok"></i>
+                            </a>
+                            <a href="https://www.youtube.com/channel/UCgrLac_OYBCVSQXXpRItAKg" target="_blank"
+                                class="footer-social" aria-label="YouTube">
+                                <i class="fab fa-youtube"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Quick Links -->
+                    <div class="footer-col">
+                        <h4 class="footer-col-title"><i class="fas fa-compass"></i> Quick
+                            Links</h4>
+                        <ul class="footer-links-list">
+                            <li><a href="#home" class="footer-link"><span class="link-arrow">→</span>
+                                    Home</a></li>
+                            <li><a href="#about" class="footer-link"><span class="link-arrow">→</span>
+                                    About Us</a></li>
+                            <li><a href="{% url 'courses' %}" class="footer-link"><span class="link-arrow">→</span>
+                                    Courses</a></li>
+                            <li><a href="#schedule" class="footer-link"><span class="link-arrow">→</span>
+                                    Schedule</a></li>
+                            <li><a href="{% url 'blog' %}" class="footer-link"><span class="link-arrow">→</span>
+                                    Blogs</a></li>
+                            <li><a href="{% url 'programmes' %}" class="footer-link"><span class="link-arrow">→</span> Programmes &amp; Fees</a></li>
+                            <li><a href="{% url 'enrolment' %}" class="footer-link"><span class="link-arrow">→</span> Enrolment</a></li>
+                            <li><a href="{% url 'payments' %}" class="footer-link"><span class="link-arrow">→</span> Payments</a></li>
+                            <li><a href="{% url 'register' %}" class="footer-link"><span class="link-arrow">→</span> Create Account</a></li>
+                            <li><a href="{% url 'login' %}" class="footer-link"><span class="link-arrow">→</span> Sign In</a></li>
+                            <li><a href="{% url 'dashboard' %}" class="footer-link"><span class="link-arrow">→</span> Student Area</a></li>
+                            <li><a href="{% url 'contact' %}" class="footer-link"><span class="link-arrow">→</span> Contact</a></li>
+                            <li><a href="{% url 'careers' %}" class="footer-link"><span class="link-arrow">→</span> Careers</a></li>
+                            <li><a href="{% url 'faq' %}" class="footer-link"><span class="link-arrow">→</span> FAQ &amp; Help</a></li>
+                            <li><a href="{% url 'support' %}" class="footer-link"><span class="link-arrow">→</span> Support</a></li>
+                            <li><a href="{% url 'sitemap' %}" class="footer-link"><span class="link-arrow">→</span> Sitemap</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Programs -->
+                    <div class="footer-col">
+                        <h4 class="footer-col-title"><i class="fas fa-code"></i> Programs</h4>
+                        <ul class="footer-links-list">
+                            <li><a href="{% url 'courses' %}" class="footer-link"><span class="link-arrow">→</span> Java
+                                    Development</a></li>
+                            <li><a href="{% url 'courses' %}" class="footer-link"><span class="link-arrow">→</span> C &
+                                    C++ Systems</a></li>
+                            <li><a href="{% url 'courses' %}" class="footer-link"><span class="link-arrow">→</span> Web
+                                    Development</a></li>
+                            <li><a href="{% url 'courses' %}" class="footer-link"><span class="link-arrow">→</span>
+                                    Python & Django</a></li>
+                            <li><a href="{% url 'courses' %}" class="footer-link"><span class="link-arrow">→</span>
+                                    Mobile (Swift)</a></li>
+                            <li><a href="{% url 'courses' %}" class="footer-link"><span class="link-arrow">→</span>
+                                    Backend (Go)</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Contact Info -->
+                    <div class="footer-col">
+                        <h4 class="footer-col-title"><i class="fas fa-headset"></i> Get in
+                            Touch</h4>
+                        <ul class="footer-contact-list">
+                            <li>
+                                <div class="contact-icon-bg"><i class="fas fa-map-marker-alt"></i></div>
+                                <span>University of Calabar,<br>Calabar,
+                                    Cross River, Nigeria</span>
+                            </li>
+                            <li>
+                                <div class="contact-icon-bg"><i class="fas fa-envelope"></i></div>
+                                <a href="mailto:technonexusacademy@gmail.com">technonexusacademy@gmail.com</a>
+                            </li>
+                            <li>
+                                <div class="contact-icon-bg"><i class="fab fa-whatsapp"></i></div>
+                                <a href="https://wa.me/2349039759275">+234
+                                    903 975 9275</a>
+                            </li>
+                            <li>
+                                <div class="contact-icon-bg"><i class="fas fa-clock"></i></div>
+                                <span>Mon - Fri: 8AM - 5PM</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Divider with Gradient -->
+        <div class="footer-divider"></div>
+
+        <!-- Footer Bottom -->
+        <div class="footer-bottom-bar">
+            <div class="container">
+                <div class="footer-bottom-content">
+                    <p class="footer-copyright">
+                        <i class="fas fa-code"></i> with <i class="fas fa-heart" style="color:#e17055;"></i> by
+                        Tech-Nexus Academy &copy; {% now "Y" %}
+                    </p>
+                    <div class="footer-payment-badges">
+                        <span class="payment-badge"><i class="fas fa-shield-alt"></i> Secure
+                            SSL</span>
+                        <span class="payment-badge"><i class="fas fa-credit-card"></i>
+                            Paystack</span>
+                        <span class="payment-badge"><i class="fas fa-university"></i> Bank
+                            Transfer</span>
+                    </div>
+                    <div class="footer-legal-links">
+                        <a href="{% url 'privacy' %}">Privacy</a>
+                        <span class="dot-separator">•</span>
+                        <a href="{% url 'terms' %}">Terms</a>
+                        <span class="dot-separator">•</span>
+                        <a href="{% url 'cookies' %}">Cookies</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </footer>
+    <!-- Human support -->
+    <div class="chat-toggles">
+        <a rel="noopener"
+            href="https://wa.me/2349039759275?text=Hi%20Tech-Nexus%20team%2C%20I%20have%20a%20question..."
+            class="whatsapp-toggle" target="_blank" aria-label="Chat with WhatsApp support" title="Human Support">
+            <i class="fab fa-whatsapp"></i>
+            <span class="tooltip">Human Support</span>
+        </a>
+    </div>
+    <script src="{% static 'Nexus/main.js' %}" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const counters = document.querySelectorAll('.stat-number');
+            counters.forEach((counter, index) => {
+                const target = Number(counter.getAttribute('data-target') || 0);
+                const duration = 1200;
+                const startTime = performance.now();
+                const startValue = 0;
+
+                const tick = (now) => {
+                    const progress = Math.min((now - startTime) / duration, 1);
+                    const eased = 1 - Math.pow(1 - progress, 3);
+                    const currentValue = Math.round(startValue + (target - startValue) * eased);
+                    counter.textContent = `${currentValue}${target === 85 ? '' : '+'}`;
+
+                    if (progress < 1) {
+                        requestAnimationFrame(tick);
+                    } else {
+                        counter.textContent = `${target}${target === 85 ? '' : '+'}`;
+                    }
+                };
+
+                setTimeout(() => requestAnimationFrame(tick), index * 120 + 150);
+            });
+
+            const timelineProgress = document.getElementById('timeline-progress');
+            const scheduleProgress = document.getElementById('schedule-progress');
+            if (timelineProgress) timelineProgress.style.width = '50%';
+            if (scheduleProgress) scheduleProgress.style.width = '75%';
+        });
+    </script>
+    {% include "Nexus/ai_chat_widget.html" %}
+</body>
+
+</html>
