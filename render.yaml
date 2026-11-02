@@ -13,9 +13,9 @@ services:
       - key: DEBUG
         value: "false"
       - key: ALLOWED_HOSTS
-        value: technonexusacademy.tech,www.technonexusacademy.tech
+        value: technonexusacademy.tech
       - key: CSRF_TRUSTED_ORIGINS
-        value: https://technonexusacademy.tech,https://www.technonexusacademy.tech
+        value: https://technonexusacademy.tech
       - key: DATABASE_URL
         sync: false
       - key: EMAIL_BACKEND
