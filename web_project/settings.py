@@ -45,7 +45,7 @@ ALLOWED_HOSTS = [
     host.strip()
     for host in os.environ.get(
         "ALLOWED_HOSTS",
-        "localhost,127.0.0.1,testserver,technonexusacademy.tech,py-nexus.vercel.app",
+        "localhost,127.0.0.1,testserver,technonexusacademy.tech,www.technonexusacademy.tech,py-nexus.vercel.app",
     ).split(",")
     if host.strip()
 ]
