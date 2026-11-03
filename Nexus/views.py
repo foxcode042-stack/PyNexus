@@ -21,7 +21,7 @@ from django.conf import settings
 from django.core.mail import BadHeaderError, EmailMessage, send_mail
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
-from django.db import transaction
+from django.db import DatabaseError, transaction
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
@@ -867,6 +867,31 @@ def issue_email_code(
     return challenge
 
 
+def send_welcome_email(user, request: HttpRequest | None = None) -> None:
+    dashboard_url = (
+        request.build_absolute_uri(reverse("dashboard"))
+        if request is not None
+        else reverse("dashboard")
+    )
+    name = user.first_name or user.username
+    try:
+        send_mail(
+            "Welcome to Tech-Nexus Academy",
+            (
+                f"Hello {name},\n\n"
+                "Welcome to Tech-Nexus Academy! Your account is ready. "
+                "We’re glad you’re here and look forward to supporting your "
+                f"learning journey.\n\nVisit your dashboard: {dashboard_url}\n\n"
+                "Tech-Nexus Academy"
+            ),
+            None,
+            [user.email],
+            fail_silently=False,
+        )
+    except (BadHeaderError, OSError, smtplib.SMTPException):
+        logger.exception("Could not send welcome email")
+
+
 def _json_body(request: HttpRequest) -> tuple[dict, JsonResponse | None]:
     try:
         data = json.loads(request.body or b"{}")
@@ -1106,6 +1131,18 @@ def api_login(request: HttpRequest) -> JsonResponse:
             {"detail": "Invalid username/email or password."},
             status=400,
         )
+    try:
+        validate_email(_account_email(user))
+    except ValidationError:
+        return JsonResponse(
+            {
+                "detail": (
+                    "This account has no valid email address for login verification. "
+                    "Contact support to update the account email."
+                )
+            },
+            status=409,
+        )
 
     purpose = "login" if user.is_active else "signup"
     authenticated_user = (
@@ -1138,6 +1175,17 @@ def api_login(request: HttpRequest) -> JsonResponse:
                 "detail": (
                     "We couldn't send your login code. Please try again later or "
                     "contact support."
+                )
+            },
+            status=503,
+        )
+    except DatabaseError:
+        logger.exception("Could not create login verification challenge")
+        return JsonResponse(
+            {
+                "detail": (
+                    "Login verification is temporarily unavailable. "
+                    "Please contact support and include the time of this attempt."
                 )
             },
             status=503,
@@ -1176,6 +1224,8 @@ def api_verify_email(request: HttpRequest) -> JsonResponse:
         return JsonResponse({"detail": message}, status=400)
 
     request.session.pop("pending_verification_email", None)
+    if challenge.purpose == "signup":
+        send_welcome_email(challenge.user, request)
     if challenge.purpose == "login":
         backend = request.session.pop("pending_auth_backend", "")
         login(
@@ -1749,6 +1799,7 @@ def verification_sent(request: HttpRequest) -> HttpResponse:
             request.session.pop("pending_verification_email", None)
             return redirect(_safe_redirect(request, next_url))
         else:
+            send_welcome_email(challenge.user, request)
             request.session.pop("pending_verification_email", None)
             messages.success(request, "Your email is verified. You can now sign in.")
             return redirect("login")
@@ -1779,6 +1830,12 @@ def resend_verification(request: HttpRequest) -> HttpResponse:
                 request,
                 "We couldn't send a verification code. Please try again later.",
             )
+        except DatabaseError:
+            logger.exception("Could not create account verification challenge")
+            messages.error(
+                request,
+                "Email verification is temporarily unavailable. Please try again later.",
+            )
     return redirect("verification_sent")
 
 
@@ -1801,6 +1858,7 @@ def verify_email(request: HttpRequest, uidb64: str, token: str) -> HttpResponse:
     if not user.is_active:
         user.is_active = True
         user.save(update_fields=["is_active"])
+        send_welcome_email(user, request)
     messages.success(request, "Your email is verified. You can now sign in.")
     return redirect("login")
 
@@ -1826,6 +1884,26 @@ def login_view(request: HttpRequest) -> HttpResponse:
     form.fields["username"].label = "Username or email"
     if request.method == "POST" and form.is_valid():
         user = form.get_user()
+        try:
+            validate_email(_account_email(user))
+        except ValidationError:
+            form.add_error(
+                None,
+                "This account has no valid email address for login verification. "
+                "Contact support to update the account email.",
+            )
+            return render(request, "Nexus/account_form.html", {
+                "title": "Sign in",
+                "eyebrow": "Welcome back",
+                "is_registration": False,
+                "form": form,
+                "google_client_id": settings.GOOGLE_CLIENT_ID,
+                "submit_label": "Sign in",
+                "alternate_url": reverse("register"),
+                "alternate_label": "New here? Create an account",
+                "next": request.GET.get("next", ""),
+                "password_help_url": reverse("password_reset"),
+            })
         next_url = request.POST.get("next") or request.GET.get("next", "")
         request.session["pending_verification_email"] = _account_email(user)
         request.session["pending_auth_backend"] = getattr(user, "backend", "")
@@ -1844,6 +1922,24 @@ def login_view(request: HttpRequest) -> HttpResponse:
             form.add_error(
                 None,
                 "We couldn't send your login code. Please try again later.",
+            )
+            return render(request, "Nexus/account_form.html", {
+                "title": "Sign in",
+                "eyebrow": "Welcome back",
+                "is_registration": False,
+                "form": form,
+                "google_client_id": settings.GOOGLE_CLIENT_ID,
+                "submit_label": "Sign in",
+                "alternate_url": reverse("register"),
+                "alternate_label": "New here? Create an account",
+                "next": request.GET.get("next", ""),
+                "password_help_url": reverse("password_reset"),
+            })
+        except DatabaseError:
+            logger.exception("Could not create login verification challenge")
+            form.add_error(
+                None,
+                "Login verification is temporarily unavailable. Please try again later.",
             )
             return render(request, "Nexus/account_form.html", {
                 "title": "Sign in",

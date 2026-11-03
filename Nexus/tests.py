@@ -5,6 +5,7 @@ from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.core import mail
+from django.db import DatabaseError
 from django.test import TestCase
 from django.test import override_settings
 from django.utils import timezone
@@ -319,6 +320,8 @@ class AcademyPageTests(TestCase):
         self.assertRedirects(response, reverse("login"), fetch_redirect_response=False)
         user.refresh_from_db()
         self.assertTrue(user.is_active)
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(mail.outbox[-1].subject, "Welcome to Tech-Nexus Academy")
 
         response = self.client.post(
             reverse("login"),
@@ -329,7 +332,7 @@ class AcademyPageTests(TestCase):
             reverse("verification_sent"),
             fetch_redirect_response=False,
         )
-        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(len(mail.outbox), 3)
         login_code = re.search(
             r"verification code is (\d{6})",
             mail.outbox[-1].body,
@@ -422,6 +425,7 @@ class AcademyPageTests(TestCase):
         user.refresh_from_db()
         self.assertTrue(user.is_active)
         self.assertFalse(response.wsgi_request.user.is_authenticated)
+        self.assertEqual(mail.outbox[-1].subject, "Welcome to Tech-Nexus Academy")
 
         response = self.client.post(
             reverse("api_auth_login"),
@@ -535,6 +539,41 @@ class AcademyPageTests(TestCase):
         )
         self.assertEqual(response.status_code, 429)
         self.assertEqual(len(mail.outbox), 1)
+
+    def test_login_rejects_accounts_without_email_for_otp(self):
+        user = get_user_model().objects.create_user(
+            username="noemail",
+            password="Zebra!Mountain7224",
+            email="",
+            is_active=True,
+        )
+        response = self.client.post(
+            reverse("api_auth_login"),
+            data={"identifier": user.username, "password": "Zebra!Mountain7224"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 409)
+        self.assertIn("no valid email", response.json()["detail"])
+        self.assertEqual(EmailVerificationCode.objects.filter(user=user).count(), 0)
+
+    @patch(
+        "Nexus.views.issue_email_code",
+        side_effect=DatabaseError("verification table is unavailable"),
+    )
+    def test_login_returns_actionable_response_when_otp_storage_fails(self, _issue_code):
+        user = get_user_model().objects.create_user(
+            username="dbfailure",
+            password="Zebra!Mountain7224",
+            email="dbfailure@example.com",
+            is_active=True,
+        )
+        response = self.client.post(
+            reverse("api_auth_login"),
+            data={"identifier": user.username, "password": "Zebra!Mountain7224"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 503)
+        self.assertIn("Login verification is temporarily unavailable", response.json()["detail"])
 
     def test_auth_api_social_signin_reports_missing_provider_configuration(self):
         response = self.client.get("/api/auth/google/")
