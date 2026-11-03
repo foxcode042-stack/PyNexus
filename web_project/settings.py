@@ -30,16 +30,32 @@ if not SECRET_KEY and not DEBUG:
 SECRET_KEY = SECRET_KEY or "django-insecure-local-development-only"
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME", "").strip()
+VERCEL_HOSTNAMES = [
+    os.environ.get(name, "").strip().lower()
+    .removeprefix("https://")
+    .removeprefix("http://")
+    .rstrip("/")
+    for name in (
+        "VERCEL_URL",
+        "VERCEL_PROJECT_PRODUCTION_URL",
+        "VERCEL_BRANCH_URL",
+    )
+]
 ALLOWED_HOSTS = [
     host.strip()
     for host in os.environ.get(
         "ALLOWED_HOSTS",
-        "localhost,127.0.0.1,testserver,technonexusacademy.tech",
+        "localhost,127.0.0.1,testserver,technonexusacademy.tech,py-nexus.vercel.app",
     ).split(",")
     if host.strip()
 ]
 if RENDER_EXTERNAL_HOSTNAME and RENDER_EXTERNAL_HOSTNAME not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+ALLOWED_HOSTS.extend(
+    hostname
+    for hostname in VERCEL_HOSTNAMES
+    if hostname and hostname not in ALLOWED_HOSTS
+)
 
 CSRF_TRUSTED_ORIGINS = [
     origin.strip().rstrip("/")
@@ -53,6 +69,11 @@ if RENDER_EXTERNAL_HOSTNAME:
     render_origin = f"https://{RENDER_EXTERNAL_HOSTNAME}"
     if render_origin not in CSRF_TRUSTED_ORIGINS:
         CSRF_TRUSTED_ORIGINS.append(render_origin)
+CSRF_TRUSTED_ORIGINS.extend(
+    origin
+    for origin in (f"https://{hostname}" for hostname in VERCEL_HOSTNAMES)
+    if origin not in CSRF_TRUSTED_ORIGINS
+)
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SECURE_SSL_REDIRECT = not DEBUG
