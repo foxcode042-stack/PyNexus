@@ -1,10 +1,15 @@
 import binascii
 import json
+import logging
 import math
+import re
 import secrets
 import smtplib
 from datetime import date, timedelta
 
+from google.auth.exceptions import GoogleAuthError
+from google.auth.transport.requests import Request as GoogleRequest
+from google.oauth2.id_token import verify_oauth2_token
 from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.decorators import login_required
@@ -32,6 +37,9 @@ from django.utils.http import (
 
 from .forms import StudentSignUpForm
 from .models import EmailVerificationCode, NewsletterSubscription, StudentProfile
+
+
+logger = logging.getLogger(__name__)
 
 
 PAGE_CONTENT = {
@@ -945,15 +953,23 @@ def api_register(request: HttpRequest) -> JsonResponse:
                 {"detail": "Enter a valid date of birth in YYYY-MM-DD format."},
                 status=400,
             )
-        dob_day, dob_month, dob_year = (
-            birth_date.day,
-            birth_date.month,
-            birth_date.year,
-        )
     else:
-        dob_day = data.get("dob_day", "")
-        dob_month = data.get("dob_month", "")
-        dob_year = data.get("dob_year", "")
+        try:
+            legacy_dob = (
+                data.get("dob_year"),
+                data.get("dob_month"),
+                data.get("dob_day"),
+            )
+            birth_date = (
+                date(*(int(value) for value in legacy_dob))
+                if all(value not in (None, "") for value in legacy_dob)
+                else None
+            )
+        except (TypeError, ValueError):
+            return JsonResponse(
+                {"detail": "Enter a valid date of birth in YYYY-MM-DD format."},
+                status=400,
+            )
 
     password = str(data.get("password", ""))
     password_confirmation = str(data.get("password_confirmation", ""))
@@ -973,10 +989,9 @@ def api_register(request: HttpRequest) -> JsonResponse:
         "occupation": data.get("occupation", ""),
         "state": data.get("state", ""),
         "location": data.get("location", ""),
-        "dob_day": dob_day,
-        "dob_month": dob_month,
-        "dob_year": dob_year,
+        "date_of_birth": birth_date.isoformat() if birth_date else "",
         "nationality": data.get("nationality", ""),
+        "terms_accepted": data.get("terms_accepted") is True,
     }
     form = StudentSignUpForm(form_data)
     if not form.is_valid():
@@ -988,15 +1003,28 @@ def api_register(request: HttpRequest) -> JsonResponse:
     if location_error or location_fields is None:
         return JsonResponse({"detail": location_error}, status=400)
 
-    with transaction.atomic():
-        user = form.save()
-        profile = StudentProfile.objects.get(user=user)
-        for field, value in location_fields.items():
-            setattr(profile, field, value)
-        profile.save(update_fields=list(location_fields))
-        email = _account_email(user)
-        request.session["pending_verification_email"] = email
-        send_verification_email(request, user)
+    try:
+        with transaction.atomic():
+            user = form.save()
+            profile = StudentProfile.objects.get(user=user)
+            for field, value in location_fields.items():
+                setattr(profile, field, value)
+            profile.save(update_fields=list(location_fields))
+            email = _account_email(user)
+            request.session["pending_verification_email"] = email
+            send_verification_email(request, user)
+    except (OSError, smtplib.SMTPException):
+        request.session.pop("pending_verification_email", None)
+        logger.exception("Could not send account verification email")
+        return JsonResponse(
+            {
+                "detail": (
+                    "Your account was not created because we couldn't send the "
+                    "verification email. Please try again later or contact support."
+                )
+            },
+            status=503,
+        )
     return JsonResponse(
         {
             "detail": "Your account has been created. Check your email for a verification code.",
@@ -1103,6 +1131,17 @@ def api_login(request: HttpRequest) -> JsonResponse:
             {"detail": "Please wait before requesting another verification code."},
             status=429,
         )
+    except (OSError, smtplib.SMTPException):
+        logger.exception("Could not send login verification email")
+        return JsonResponse(
+            {
+                "detail": (
+                    "We couldn't send your login code. Please try again later or "
+                    "contact support."
+                )
+            },
+            status=503,
+        )
 
     email = _account_email(user)
     request.session["pending_verification_email"] = email
@@ -1180,6 +1219,12 @@ def api_resend_code(request: HttpRequest) -> JsonResponse:
             {"detail": "Please wait before requesting another verification code."},
             status=429,
         )
+    except (OSError, smtplib.SMTPException):
+        logger.exception("Could not resend account verification email")
+        return JsonResponse(
+            {"detail": "We couldn't send a verification code. Please try again later."},
+            status=503,
+        )
     email = _account_email(user)
     request.session["pending_verification_email"] = email
     return JsonResponse(
@@ -1235,11 +1280,109 @@ def api_logout_other_devices(request: HttpRequest) -> JsonResponse:
 
 
 def api_social_login(request: HttpRequest, provider: str) -> JsonResponse:
-    if request.method != "GET":
+    if provider != "google":
+        if request.method != "GET":
+            return _api_method_not_allowed()
+        return JsonResponse(
+            {"detail": f"{provider.title()} sign-in is not configured."},
+            status=501,
+        )
+    if request.method != "POST":
         return _api_method_not_allowed()
+    if not settings.GOOGLE_CLIENT_ID:
+        return JsonResponse(
+            {"detail": "Google sign-in is not configured on the server."},
+            status=503,
+        )
+
+    data, error = _json_body(request)
+    if error:
+        return error
+    credential = data.get("credential")
+    if not isinstance(credential, str) or not credential or len(credential) > 10_000:
+        return JsonResponse({"detail": "A valid Google credential is required."}, status=400)
+
+    try:
+        claims = verify_oauth2_token(
+            credential,
+            GoogleRequest(),
+            settings.GOOGLE_CLIENT_ID,
+        )
+    except (GoogleAuthError, ValueError):
+        logger.info("Google sign-in rejected an invalid identity token")
+        return JsonResponse({"detail": "Google sign-in could not verify your account."}, status=401)
+
+    email = claims.get("email")
+    if (
+        not isinstance(email, str)
+        or claims.get("email_verified") is not True
+        or not isinstance(claims.get("sub"), str)
+    ):
+        return JsonResponse(
+            {"detail": "Google must provide a verified email address."},
+            status=401,
+        )
+    email = email.strip()
+    try:
+        validate_email(email)
+    except ValidationError:
+        return JsonResponse({"detail": "Google returned an invalid email address."}, status=401)
+
+    user_model = get_user_model()
+    user = user_model._default_manager.filter(email__iexact=email).first()
+    if user is None and data.get("terms_accepted") is not True:
+        return JsonResponse(
+            {"detail": "Please accept the Terms and Conditions and Privacy Policy before creating an account with Google."},
+            status=400,
+        )
+
+    if user is None:
+        username_field = user_model._meta.get_field(user_model.USERNAME_FIELD)
+        local_part = email.split("@", maxsplit=1)[0]
+        base_username = re.sub(r"[^A-Za-z0-9.@_+-]", "", local_part)
+        base_username = (base_username or "googleuser")[: username_field.max_length - 7]
+        username = base_username
+        while user_model._default_manager.filter(
+            **{f"{user_model.USERNAME_FIELD}__iexact": username}
+        ).exists():
+            username = f"{base_username}_{secrets.token_hex(3)}"
+
+        full_name = str(claims.get("name", "")).strip()
+        first_name = str(claims.get("given_name", "")).strip()[:150]
+        last_name = str(claims.get("family_name", "")).strip()[:150]
+        if not first_name and full_name:
+            first_name = full_name.split()[0][:150]
+        if not last_name and len(full_name.split()) > 1:
+            last_name = " ".join(full_name.split()[1:])[:150]
+
+        user = user_model(
+            **{
+                user_model.USERNAME_FIELD: username,
+                "email": email,
+                "first_name": first_name,
+                "last_name": last_name,
+                "is_active": True,
+            }
+        )
+        user.set_unusable_password()
+        user.save()
+        StudentProfile.objects.get_or_create(
+            user=user,
+            defaults={
+                "full_name": full_name[:150],
+                "terms_accepted_at": timezone.now(),
+            },
+        )
+    elif not user.is_active:
+        user.is_active = True
+        user.save(update_fields=["is_active"])
+
+    login(request, user, backend="django.contrib.auth.backends.ModelBackend")
     return JsonResponse(
-        {"detail": f"{provider.title()} sign-in is unavailable until provider credentials are configured."},
-        status=501,
+        {
+            "authenticated": True,
+            "redirect_url": _safe_redirect(request, str(data.get("next", ""))),
+        }
     )
 
 
@@ -1555,16 +1698,26 @@ def register(request: HttpRequest) -> HttpResponse:
 
     form = StudentSignUpForm(request.POST if request.method == "POST" else None)
     if request.method == "POST" and form.is_valid():
-        with transaction.atomic():
-            user = form.save()
-            request.session["pending_verification_email"] = user.email
-            send_verification_email(request, user)
-        return redirect("verification_sent")
+        try:
+            with transaction.atomic():
+                user = form.save()
+                request.session["pending_verification_email"] = user.email
+                send_verification_email(request, user)
+        except (OSError, smtplib.SMTPException):
+            request.session.pop("pending_verification_email", None)
+            logger.exception("Could not send account verification email")
+            form.add_error(
+                None,
+                "We couldn't send your verification email. Please try again later.",
+            )
+        else:
+            return redirect("verification_sent")
     return render(request, "Nexus/account_form.html", {
         "title": "Create your account",
         "eyebrow": "Free account registration",
         "is_registration": True,
         "form": form,
+        "google_client_id": settings.GOOGLE_CLIENT_ID,
         "submit_label": "Create account",
         "alternate_url": reverse("login"),
         "alternate_label": "Already have an account? Sign in",
@@ -1620,6 +1773,12 @@ def resend_verification(request: HttpRequest) -> HttpResponse:
             request.session["pending_verification_email"] = _account_email(user)
         except VerificationRateLimit:
             messages.error(request, "Please wait before requesting another verification code.")
+        except (OSError, smtplib.SMTPException):
+            logger.exception("Could not resend account verification email")
+            messages.error(
+                request,
+                "We couldn't send a verification code. Please try again later.",
+            )
     return redirect("verification_sent")
 
 
@@ -1680,12 +1839,31 @@ def login_view(request: HttpRequest) -> HttpResponse:
         except VerificationRateLimit:
             messages.error(request, "Please wait before requesting another verification code.")
             return redirect("verification_sent")
+        except (OSError, smtplib.SMTPException):
+            logger.exception("Could not send login verification email")
+            form.add_error(
+                None,
+                "We couldn't send your login code. Please try again later.",
+            )
+            return render(request, "Nexus/account_form.html", {
+                "title": "Sign in",
+                "eyebrow": "Welcome back",
+                "is_registration": False,
+                "form": form,
+                "google_client_id": settings.GOOGLE_CLIENT_ID,
+                "submit_label": "Sign in",
+                "alternate_url": reverse("register"),
+                "alternate_label": "New here? Create an account",
+                "next": request.GET.get("next", ""),
+                "password_help_url": reverse("password_reset"),
+            })
         return redirect("verification_sent")
     return render(request, "Nexus/account_form.html", {
         "title": "Sign in",
         "eyebrow": "Welcome back",
         "is_registration": False,
         "form": form,
+        "google_client_id": settings.GOOGLE_CLIENT_ID,
         "submit_label": "Sign in",
         "alternate_url": reverse("register"),
         "alternate_label": "New here? Create an account",

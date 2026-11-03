@@ -31,7 +31,7 @@
     });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-      throw new Error(data.detail || "Unable to complete this request.");
+      throw new Error(data.detail || `The server could not complete the request (HTTP ${response.status}).`);
     }
     return data;
   };
@@ -40,6 +40,8 @@
     login: (identifier, password, remember, next = "") =>
       request("login", { identifier, password, remember, next }),
     register: (details) => request("register", details),
+    google: (credential, termsAccepted, next = "") =>
+      request("google", { credential, terms_accepted: termsAccepted, next }),
     verifyEmail: (email, code) => request("verify-email", { email, code }),
     resendCode: (email) => request("resend-code", { email }),
     forgotPassword: (email) => request("forgot-password", { email }),
@@ -106,6 +108,13 @@
   if (registerForm) {
     const locationButton = registerForm.querySelector("[data-capture-location]");
     const locationStatus = registerForm.querySelector("[data-location-status]");
+    const countryField = registerForm.elements.country;
+    const phoneField = registerForm.elements.phone_number;
+    const phoneExamples = { NG: "+234 801 234 5678", US: "+1 202 555 0123" };
+    countryField?.addEventListener("change", () => {
+      phoneField.placeholder = phoneExamples[countryField.value]
+        || "Include country code if outside your selected country";
+    });
     locationButton?.addEventListener("click", () => {
       if (!navigator.geolocation) {
         locationStatus.textContent = "Location sharing is not available in this browser.";
@@ -115,13 +124,54 @@
       locationButton.disabled = true;
       locationStatus.textContent = "Waiting for your permission and location…";
       navigator.geolocation.getCurrentPosition(
-        ({ coords }) => {
+        async ({ coords }) => {
           registerForm.elements.latitude.value = String(coords.latitude);
           registerForm.elements.longitude.value = String(coords.longitude);
           registerForm.elements.location_accuracy.value = String(coords.accuracy);
           registerForm.elements.location_captured_at.value = new Date().toISOString();
-          locationStatus.textContent = `Location captured (about ${Math.round(coords.accuracy)} m accuracy).`;
-          locationButton.disabled = false;
+          locationStatus.textContent = "Looking up your city and state with OpenStreetMap…";
+          try {
+            const params = new URLSearchParams({
+              format: "jsonv2",
+              lat: String(coords.latitude),
+              lon: String(coords.longitude),
+              zoom: "18",
+              addressdetails: "1",
+            });
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?${params}`,
+              { headers: { "Accept-Language": navigator.language || "en" } },
+            );
+            if (!response.ok) {
+              throw new Error("OpenStreetMap could not look up this location.");
+            }
+            const result = await response.json();
+            const address = result.address || {};
+            const city = address.city || address.town || address.village
+              || address.hamlet || address.suburb || "";
+            const state = address.state || address.state_district || address.region || "";
+            const country = address.country || "";
+            const countryCode = (address.country_code || "").toUpperCase();
+            if (city || state || country) {
+              registerForm.elements.location.value = [city, state, country]
+                .filter(Boolean)
+                .join(", ");
+            }
+            if (state) registerForm.elements.state.value = state;
+            if (countryCode && [...countryField.options].some((option) => option.value === countryCode)) {
+              countryField.value = countryCode;
+              countryField.dispatchEvent(new Event("change"));
+            }
+            if (address.postcode && !registerForm.elements.zip_code.value) {
+              registerForm.elements.zip_code.value = address.postcode;
+            }
+            locationStatus.textContent = `City and state filled from your location. Approximate accuracy: ${Math.round(coords.accuracy)} m. Lookup by OpenStreetMap.`;
+          } catch (error) {
+            registerForm.elements.location.value = `${coords.latitude.toFixed(5)}, ${coords.longitude.toFixed(5)}`;
+            locationStatus.textContent = `${error.message} Coordinates were placed in the location field; you can edit them.`;
+          } finally {
+            locationButton.disabled = false;
+          }
         },
         (error) => {
           const message = error.code === error.PERMISSION_DENIED
@@ -142,9 +192,6 @@
       }
       const formData = new FormData(registerForm);
       const value = (name) => (formData.get(name) || "").toString().trim();
-      const day = value("dob_day").padStart(2, "0");
-      const month = value("dob_month").padStart(2, "0");
-      const year = value("dob_year");
       const numberOrNull = (name) => {
         const raw = value(name);
         return raw === "" ? null : Number(raw);
@@ -164,8 +211,9 @@
         longitude: numberOrNull("longitude"),
         location_accuracy: numberOrNull("location_accuracy"),
         location_captured_at: value("location_captured_at") || null,
-        date_of_birth: `${year}-${month}-${day}`,
+        date_of_birth: value("date_of_birth"),
         nationality: value("nationality"),
+        terms_accepted: formData.get("terms_accepted") === "on",
         password: value("password1"),
         password_confirmation: value("password2"),
       };
@@ -315,4 +363,20 @@
       button.disabled = false;
     }
   });
+
+  window.handleGoogleSignIn = async ({ credential }) => {
+    try {
+      const termsCheckbox = registerForm?.elements.terms_accepted
+        || document.querySelector("[data-google-terms]");
+      const next = new URLSearchParams(window.location.search).get("next") || "";
+      const result = await authApi.google(
+        credential,
+        termsCheckbox?.checked === true,
+        next,
+      );
+      window.location.assign(result.redirect_url || "/dashboard/");
+    } catch (error) {
+      showFeedback(card, error.message, true);
+    }
+  };
 })();

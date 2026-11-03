@@ -1,5 +1,7 @@
 import re
+import smtplib
 from datetime import timedelta
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.core import mail
@@ -243,6 +245,10 @@ class AcademyPageTests(TestCase):
         self.assertContains(registration, 'data-auth-register')
         self.assertContains(registration, 'data-capture-location')
         self.assertContains(registration, 'name="password2"')
+        self.assertContains(registration, 'type="date"')
+        self.assertContains(registration, 'name="terms_accepted"')
+        self.assertContains(registration, "Select a country")
+        self.assertContains(registration, "OpenStreetMap")
         self.assertContains(registration, 'data-api-base="/api"')
 
         sign_in = self.client.get(reverse("login"))
@@ -268,15 +274,14 @@ class AcademyPageTests(TestCase):
                 "last_name": "Lovelace",
                 "email": "ada@example.com",
                 "phone_number": "+2348012345678",
-                "country": "Nigeria",
+                "country": "NG",
                 "zip_code": "540001",
-                "occupation": "Student",
+                "occupation": "student",
                 "state": "Cross River",
                 "location": "Calabar",
-                "dob_day": "10",
-                "dob_month": "12",
-                "dob_year": "2000",
-                "nationality": "Nigerian",
+                "date_of_birth": "2000-12-10",
+                "nationality": "NG",
+                "terms_accepted": "on",
                 "password1": "Zebra!Mountain7224",
                 "password2": "Zebra!Mountain7224",
             },
@@ -289,8 +294,9 @@ class AcademyPageTests(TestCase):
         self.assertEqual(profile.state, "Cross River")
         self.assertEqual(profile.zip_code, "540001")
         self.assertEqual(profile.location, "Calabar")
-        self.assertEqual(profile.nationality, "Nigerian")
+        self.assertEqual(profile.nationality, "Nigeria")
         self.assertEqual(str(profile.date_of_birth), "2000-12-10")
+        self.assertIsNotNone(profile.terms_accepted_at)
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].to, ["ada@example.com"])
 
@@ -372,9 +378,9 @@ class AcademyPageTests(TestCase):
                 "first_name": "Grace",
                 "last_name": "Hopper",
                 "phone_number": "+2348012345678",
-                "country": "Nigeria",
+                "country": "NG",
                 "zip_code": "540001",
-                "occupation": "Student",
+                "occupation": "student",
                 "state": "Cross River",
                 "location": "Calabar",
                 "latitude": 4.9517,
@@ -382,7 +388,8 @@ class AcademyPageTests(TestCase):
                 "location_accuracy": 18.5,
                 "location_captured_at": "2026-11-01T21:40:00Z",
                 "date_of_birth": "2000-12-10",
-                "nationality": "Nigerian",
+                "nationality": "NG",
+                "terms_accepted": True,
                 "password": "Zebra!Mountain7224",
                 "password_confirmation": "Zebra!Mountain7224",
             },
@@ -464,13 +471,14 @@ class AcademyPageTests(TestCase):
             "first_name": "Safe",
             "last_name": "Student",
             "phone_number": "+2348012345678",
-            "country": "Nigeria",
+            "country": "NG",
             "zip_code": "540001",
-            "occupation": "Student",
+            "occupation": "student",
             "state": "Cross River",
             "location": "Calabar",
             "date_of_birth": "2000-12-10",
-            "nationality": "Nigerian",
+            "nationality": "NG",
+            "terms_accepted": True,
             "password": "Zebra!Mountain7224",
             "password_confirmation": "Different!Password7224",
         }
@@ -529,10 +537,157 @@ class AcademyPageTests(TestCase):
         self.assertEqual(len(mail.outbox), 1)
 
     def test_auth_api_social_signin_reports_missing_provider_configuration(self):
-        for provider in ("google", "github"):
-            with self.subTest(provider=provider):
-                response = self.client.get(f"/api/auth/{provider}/")
-                self.assertEqual(response.status_code, 501)
+        response = self.client.get("/api/auth/google/")
+        self.assertEqual(response.status_code, 405)
+        response = self.client.get("/api/auth/github/")
+        self.assertEqual(response.status_code, 501)
+
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+    def test_registration_api_requires_terms_and_validates_phone_and_postal_code(self):
+        registration = {
+            "username": "validatedstudent",
+            "email": "validated@example.com",
+            "first_name": "Valid",
+            "last_name": "Student",
+            "phone_number": "2025550123",
+            "country": "US",
+            "zip_code": "90210",
+            "occupation": "student",
+            "state": "California",
+            "location": "Beverly Hills",
+            "date_of_birth": "2000-12-10",
+            "nationality": "US",
+            "password": "Zebra!Mountain7224",
+            "password_confirmation": "Zebra!Mountain7224",
+        }
+
+        response = self.client.post(
+            reverse("api_auth_register"),
+            data={**registration, "terms_accepted": False},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("terms_accepted", response.json()["errors"])
+
+        response = self.client.post(
+            reverse("api_auth_register"),
+            data={**registration, "terms_accepted": True, "zip_code": "9021"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("zip_code", response.json()["errors"])
+
+        response = self.client.post(
+            reverse("api_auth_register"),
+            data={**registration, "terms_accepted": True, "phone_number": "123"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("phone_number", response.json()["errors"])
+        self.assertFalse(
+            get_user_model().objects.filter(username="validatedstudent").exists()
+        )
+
+        response = self.client.post(
+            reverse("api_auth_register"),
+            data={**registration, "terms_accepted": True},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 201)
+        student = get_user_model().objects.get(username="validatedstudent")
+        self.assertEqual(student.student_profile.phone, "+12025550123")
+
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+    def test_registration_reports_smtp_failure_without_creating_account(self):
+        with patch(
+            "Nexus.views.send_mail",
+            side_effect=smtplib.SMTPAuthenticationError(535, b"Authentication failed"),
+        ):
+            response = self.client.post(
+                reverse("api_auth_register"),
+                data={
+                    "username": "mailfailure",
+                    "email": "mailfailure@example.com",
+                    "first_name": "Mail",
+                    "last_name": "Failure",
+                    "phone_number": "+2348012345678",
+                    "country": "NG",
+                    "zip_code": "540001",
+                    "occupation": "student",
+                    "state": "Cross River",
+                    "location": "Calabar",
+                    "date_of_birth": "2000-12-10",
+                    "nationality": "NG",
+                    "terms_accepted": True,
+                    "password": "Zebra!Mountain7224",
+                    "password_confirmation": "Zebra!Mountain7224",
+                },
+                content_type="application/json",
+            )
+
+        self.assertEqual(response.status_code, 503)
+        self.assertIn("verification email", response.json()["detail"])
+        self.assertFalse(
+            get_user_model().objects.filter(username="mailfailure").exists()
+        )
+
+    @override_settings(
+        GOOGLE_CLIENT_ID="test-google-client.apps.googleusercontent.com"
+    )
+    @patch("Nexus.views.verify_oauth2_token")
+    def test_google_signin_creates_account_only_after_consent_and_verified_email(
+        self,
+        verify_token,
+    ):
+        verify_token.return_value = {
+            "email": "google-student@example.com",
+            "email_verified": True,
+            "sub": "google-subject-123",
+            "name": "Google Student",
+            "given_name": "Google",
+            "family_name": "Student",
+        }
+        response = self.client.post(
+            "/api/auth/google/",
+            data={"credential": "test-token", "terms_accepted": False},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(
+            get_user_model().objects.filter(email="google-student@example.com").exists()
+        )
+
+        response = self.client.post(
+            "/api/auth/google/",
+            data={"credential": "test-token", "terms_accepted": True},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()["authenticated"])
+        user = get_user_model().objects.get(email="google-student@example.com")
+        self.assertTrue(user.is_active)
+        self.assertFalse(user.has_usable_password())
+        self.assertIsNotNone(user.student_profile.terms_accepted_at)
+        self.assertEqual(verify_token.call_count, 2)
+        self.assertEqual(
+            verify_token.call_args.args[2],
+            "test-google-client.apps.googleusercontent.com",
+        )
+
+        verify_token.return_value = {
+            "email": "unverified@example.com",
+            "email_verified": False,
+            "sub": "unverified-subject",
+        }
+        response = self.client.post(
+            "/api/auth/google/",
+            data={"credential": "unverified-token", "terms_accepted": True},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 401)
+        self.assertFalse(
+            get_user_model().objects.filter(email="unverified@example.com").exists()
+        )
 
     @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
     def test_auth_api_rejects_expired_email_codes(self):

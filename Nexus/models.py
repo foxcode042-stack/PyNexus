@@ -61,6 +61,7 @@ class StudentProfile(models.Model):
     location_accuracy = models.FloatField(blank=True, null=True)
     location_captured_at = models.DateTimeField(blank=True, null=True)
     nationality = models.CharField(max_length=100, blank=True)
+    terms_accepted_at = models.DateTimeField(blank=True, null=True)
     address = models.TextField(blank=True)
     parent_name = models.CharField(max_length=150, blank=True)
     parent_phone = models.CharField(max_length=30, blank=True)

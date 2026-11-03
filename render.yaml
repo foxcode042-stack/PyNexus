@@ -21,7 +21,7 @@ services:
       - key: EMAIL_BACKEND
         value: django.core.mail.backends.smtp.EmailBackend
       - key: EMAIL_HOST
-        sync: false
+        value: smtp-relay.brevo.com
       - key: EMAIL_PORT
         value: "587"
       - key: EMAIL_HOST_USER
@@ -30,5 +30,9 @@ services:
         sync: false
       - key: EMAIL_USE_TLS
         value: "true"
+      - key: EMAIL_USE_SSL
+        value: "false"
       - key: DEFAULT_FROM_EMAIL
         value: noreply@technonexusacademy.tech
+      - key: GOOGLE_CLIENT_ID
+        value: 270348330205-tjehg7dmtigqmr1p55031mdems4gs8lf.apps.googleusercontent.com

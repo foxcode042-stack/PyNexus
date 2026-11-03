@@ -56,15 +56,23 @@
             {% endif %}
             <p class="auth-feedback" data-auth-feedback role="status" hidden></p>
 
-            <div class="auth-social" aria-label="Social sign-in options">
-                <button type="button" class="auth-social-button" disabled aria-describedby="auth-social-note">
-                    <span class="auth-google-mark" aria-hidden="true">G</span>Google
-                </button>
-                <button type="button" class="auth-social-button" disabled aria-describedby="auth-social-note">
-                    <span class="auth-github-mark" aria-hidden="true">GH</span>GitHub
-                </button>
-            </div>
-            <p class="auth-social-note" id="auth-social-note">Google and GitHub sign-in will be available when provider credentials are configured.</p>
+            {% if google_client_id %}
+                <div id="g_id_onload"
+                     data-client_id="{{ google_client_id }}"
+                     data-callback="handleGoogleSignIn"
+                     data-auto_prompt="false"></div>
+                <div class="auth-google-button g_id_signin"
+                     data-type="standard"
+                     data-size="large"
+                     data-theme="outline"
+                     data-text="continue_with"
+                     data-shape="rectangular"
+                     data-width="360"
+                     data-logo_alignment="left"></div>
+            {% endif %}
+            <p class="auth-social-note" id="auth-social-note">
+                {% if google_client_id %}Continue securely with Google or use your email.{% else %}Google sign-in is not configured.{% endif %}
+            </p>
             <div class="auth-divider"><span>or continue with email</span></div>
 
             <form method="post" class="auth-form" {% if is_registration %}data-auth-register{% else %}data-auth-login{% endif %}>
@@ -75,17 +83,31 @@
                 {% endif %}
                 <div class="{% if is_registration %}auth-fields-grid{% else %}auth-fields-stack{% endif %}">
                     {% for field in form %}
-                        <div class="auth-field{% if field.name == 'password1' or field.name == 'password2' %} auth-field-password{% endif %}">
-                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                            {{ field }}
-                            {% if field.help_text %}<div class="auth-field-help">{{ field.help_text|safe }}</div>{% endif %}
-                            {% for error in field.errors %}<p class="auth-field-error" role="alert">{{ error }}</p>{% endfor %}
-                            {% if field.name == "location" and is_registration %}
-                                <button class="auth-location-button" type="button" data-capture-location>Use my current location</button>
-                                <p class="auth-location-status" data-location-status>Optional: browser location is only saved if you choose to share it.</p>
-                            {% endif %}
-                        </div>
+                        {% if field.name == "terms_accepted" %}
+                            <div class="auth-field-consent">
+                                {{ field }}
+                                <label for="{{ field.id_for_label }}">I agree to the <a href="{% url 'terms' %}" target="_blank" rel="noopener">Terms and Conditions</a> and <a href="{% url 'privacy' %}" target="_blank" rel="noopener">Privacy Policy</a>.</label>
+                                {% for error in field.errors %}<p class="auth-field-error" role="alert">{{ error }}</p>{% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="auth-field{% if field.name == 'password1' or field.name == 'password2' %} auth-field-password{% endif %}">
+                                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.help_text %}<div class="auth-field-help">{{ field.help_text|safe }}</div>{% endif %}
+                                {% for error in field.errors %}<p class="auth-field-error" role="alert">{{ error }}</p>{% endfor %}
+                                {% if field.name == "location" and is_registration %}
+                                    <button class="auth-location-button" type="button" data-capture-location>Use my current location</button>
+                                    <p class="auth-location-status" data-location-status>Optional: share your location to fill city and state. Coordinates are sent to OpenStreetMap for lookup.</p>
+                                {% endif %}
+                            </div>
+                        {% endif %}
                     {% endfor %}
+                    {% if not is_registration %}
+                        <label class="auth-field-consent">
+                            <input type="checkbox" class="account-checkbox" data-google-terms>
+                            I agree to the Terms and Conditions and Privacy Policy if I am creating an account with Google.
+                        </label>
+                    {% endif %}
                 </div>
                 {% if is_registration %}
                     <input type="hidden" name="latitude">
@@ -118,10 +140,11 @@
                 <button class="auth-inline-button" type="button" data-hide-forgot>Back to sign in</button>
             </section>
 
-            <p class="auth-terms">By continuing, you agree to our <a href="{% url 'terms' %}">Terms</a> and <a href="{% url 'privacy' %}">Privacy Policy</a>.</p>
+            <p class="auth-terms">Account registration requires your agreement to our Terms and Privacy Policy.</p>
             <a class="auth-home-link" href="{% url 'home' %}">← Back to Tech-Nexus Academy</a>
         </section>
     </main>
+    {% if google_client_id %}<script src="https://accounts.google.com/gsi/client" async defer></script>{% endif %}
     <script src="{% static 'Nexus/auth.js' %}" defer></script>
     {% include "Nexus/ai_chat_widget.html" %}
 </body>

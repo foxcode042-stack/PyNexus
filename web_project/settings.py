@@ -28,6 +28,10 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "")
 if not SECRET_KEY and not DEBUG:
     raise ImproperlyConfigured("Set SECRET_KEY in the production environment.")
 SECRET_KEY = SECRET_KEY or "django-insecure-local-development-only"
+GOOGLE_CLIENT_ID = os.environ.get(
+    "GOOGLE_CLIENT_ID",
+    "270348330205-tjehg7dmtigqmr1p55031mdems4gs8lf.apps.googleusercontent.com",
+).strip()
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME", "").strip()
 VERCEL_HOSTNAMES = [
