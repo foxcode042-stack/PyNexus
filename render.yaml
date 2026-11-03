@@ -6,7 +6,7 @@ services:
     buildCommand: pip install -r requirements.txt && python manage.py collectstatic --no-input && python manage.py migrate
     startCommand: gunicorn web_project.wsgi:application --bind 0.0.0.0:$PORT
     healthCheckPath: /
-    autoDeploy: false
+    autoDeploy: true
     envVars:
       - key: SECRET_KEY
         generateValue: true
@@ -18,21 +18,17 @@ services:
         value: https://technonexusacademy.tech,https://www.technonexusacademy.tech
       - key: DATABASE_URL
         sync: false
-      - key: EMAIL_BACKEND
-        value: django.core.mail.backends.smtp.EmailBackend
-      - key: EMAIL_HOST
+      - key: BREVO_SMTP_HOST
         value: smtp-relay.brevo.com
-      - key: EMAIL_PORT
+      - key: BREVO_SMTP_PORT
         value: "587"
-      - key: EMAIL_HOST_USER
+      - key: BREVO_SMTP_USER
         sync: false
-      - key: EMAIL_HOST_PASSWORD
+      - key: BREVO_SMTP_KEY
         sync: false
-      - key: EMAIL_USE_TLS
-        value: "true"
-      - key: EMAIL_USE_SSL
-        value: "false"
       - key: DEFAULT_FROM_EMAIL
         value: noreply@technonexusacademy.tech
+      - key: SUPPORT_EMAIL
+        value: support@technonexusacademy.tech
       - key: GOOGLE_CLIENT_ID
         value: 270348330205-tjehg7dmtigqmr1p55031mdems4gs8lf.apps.googleusercontent.com

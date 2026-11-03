@@ -81,3 +81,9 @@
     </section>
 </div>
 <script src="{% static 'Nexus/ai_tutor.js' %}" defer></script>
+{% if vercel_analytics_enabled %}
+<script>
+    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+{% endif %}
