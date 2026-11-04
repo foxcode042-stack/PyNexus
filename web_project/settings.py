@@ -63,7 +63,7 @@ CSRF_TRUSTED_ORIGINS = [
     for origin in os.environ.get(
         "CSRF_TRUSTED_ORIGINS",
         "https://www.technonexusacademy.tech",
-    ).split(",") 
+    ).split(",")
     if origin.strip()
 ]
 if RENDER_EXTERNAL_HOSTNAME:
