@@ -1,3 +1,19 @@
+[project]
+name = "pynexus"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "Django>=6.0.9,<6.1",
+    "dj-database-url>=2.3,<4",
+    "django-allauth>=65.20,<66",
+    "django-countries>=8.2,<9",
+    "google-auth[requests]>=2.40,<3",
+    "gunicorn>=23,<24",
+    "phonenumbers>=9.0,<10",
+    "psycopg[binary]>=3.2,<4",
+    "whitenoise>=6.9,<7",
+]
+
 [tool.vercel]
 entrypoint = "web_project.wsgi:application"
 
